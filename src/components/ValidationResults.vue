@@ -35,8 +35,18 @@
     <!-- Metadata -->
     <p><strong>Title:</strong> {{ results.metadata?.title || "N/A" }}</p>
     <p>
+      <strong>Title Length::</strong> {{ results.metadata?.title_length || "N/A" }}
+    </p>
+    <p>
       <strong>Description:</strong> {{ results.metadata?.description || "N/A" }}
     </p>
+    <p>
+      <strong>Description Length:</strong> {{ results.metadata?.description_length || "N/A" }}
+    </p>
+    <p>
+      <strong>Duplicate Title:</strong> {{ results.metadata?.duplicate_title || "N/A" }}
+    </p>
+    
 
     <!-- SOP Compliance -->
     <h4 class="text-md font-semibold mt-4">SOP Compliance</h4>

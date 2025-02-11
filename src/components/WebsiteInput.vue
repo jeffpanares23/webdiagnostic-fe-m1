@@ -48,7 +48,7 @@ export default {
           "http://127.0.0.1:8000/api/analyze-website",
           { url: formattedUrl }
         );
-
+        
         // ✅ Ensure the response contains valid data
         if (!response.data || response.data.error) {
           throw new Error(
