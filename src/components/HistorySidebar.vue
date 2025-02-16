@@ -63,6 +63,7 @@ export default {
   methods: {
     selectHistory(item) {
       this.$emit("select", item);
+      this.$emit("updateUrl", item.url);
     },
   },
 };

@@ -25,46 +25,60 @@
 import axios from "axios";
 
 export default {
+  props: ["modelValue"], // Bind to parent component
+  emits: ["update:modelValue", "loading", "results"], // Declare emitted events
+
   data() {
     return {
-      websiteUrl: "",
       errorMessage: "",
     };
+  },
+  computed: {
+    websiteUrl: {
+      get() {
+        return this.modelValue || ""; // Get value from parent
+      },
+      set(value) {
+        this.$emit("update:modelValue", value); // Update parent when input changes
+      },
+    },
   },
   methods: {
     async submitUrl() {
       this.errorMessage = "";
       this.$emit("loading"); // Trigger loading state in parent component
 
-      // ✅ Ensure URL has proper format
+      // Ensure websiteUrl is defined and not empty
+      if (!this.websiteUrl || this.websiteUrl.trim() === "") {
+        this.errorMessage = "Please enter a valid URL.";
+        return;
+      }
+
       let formattedUrl = this.websiteUrl.trim();
       if (!/^https?:\/\//i.test(formattedUrl)) {
-        formattedUrl = "http://" + formattedUrl;
+        formattedUrl = "http://" + formattedUrl; // ✅ Ensure protocol exists
       }
 
       try {
-        // ✅ Call `analyze-website` API
         const response = await axios.post(
           "http://127.0.0.1:8000/api/analyze-website",
           { url: formattedUrl }
         );
-        
-        // ✅ Ensure the response contains valid data
+
         if (!response.data || response.data.error) {
           throw new Error(
             response.data.error || "Invalid response from server."
           );
         }
 
-        // ✅ Process API Response
         const processedData = {
           url: formattedUrl,
           metadata: response.data.metadata || {},
           sop: response.data.sop || {},
           seo_checks: response.data.seo_checks || {},
+          issues: response.data.issues || [],
         };
 
-        // ✅ Emit results back to parent component
         this.$emit("results", processedData);
       } catch (error) {
         this.errorMessage =

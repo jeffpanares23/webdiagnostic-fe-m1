@@ -4,7 +4,11 @@
     <div
       class="lg:w-1/4 w-full bg-white shadow-md lg:relative fixed inset-y-0 left-0 z-10 h-full overflow-y-auto"
     >
-      <HistorySidebar :history="history" @select="handleHistorySelect" />
+      <HistorySidebar
+        :history="history"
+        @select="handleHistorySelect"
+        @updateUrl="websiteUrl = $event"
+      />
     </div>
 
     <!-- Main Content -->
@@ -12,7 +16,11 @@
       class="lg:w-3/4 w-full flex-1 p-4 lg:ml-1/4 container mx-auto space-y-6"
     >
       <SubNavigation />
-      <WebsiteInput @loading="setLoading" @results="handleResults" />
+      <WebsiteInput
+        @loading="setLoading"
+        @results="handleResults"
+        v-model="websiteUrl"
+      />
       <ExportButtons v-if="results" :results="results" />
 
       <!-- Tabs -->
@@ -62,6 +70,7 @@ export default {
   },
   data() {
     return {
+      websiteUrl: "",
       loading: false,
       results: null,
       tabs: ["Results"],
@@ -78,7 +87,6 @@ export default {
         const response = await axios.get(
           "http://127.0.0.1:8000/api/diagnostic-history"
         );
-        console.log("History API Response:", response.data); // Debugging
         this.history = response.data;
       } catch (error) {
         console.error("Failed to fetch history:", error);
@@ -86,6 +94,10 @@ export default {
     },
     handleHistorySelect(selectedResult) {
       console.log("Selected History Data:", selectedResult); // Debugging
+
+      // ✅ Auto-fill the input field
+      this.websiteUrl = selectedResult.url;
+
       this.results = selectedResult; // Ensure SOP Compliance details are included
     },
     handleResults(newResults) {
