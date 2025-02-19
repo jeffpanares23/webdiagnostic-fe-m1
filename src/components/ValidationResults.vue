@@ -24,15 +24,25 @@
     <!-- Metadata Validation (Page Title Analysis) -->
     <div class="metadata bg-gray-50 p-4 rounded-md border">
       <h3 class="text-md font-semibold mb-2">Metadata Validation</h3>
-      <div class="p-3 border-b bg-white shadow-md rounded-md">
-        <p class="font-bold text-green-600">✅ Meta Title Test</p>
-        <p><strong>Text:</strong> {{ results.metadata?.title || "N/A" }}</p>
+      <div class="p-3 border-b bg-white shadow-md rounded-md mb-2">
+        <p class="font-bold">Meta Title Test</p>
         <p>
-          <strong>Length:</strong>
-          {{ results.metadata?.title_length || 0 }} characters
+          <strong>Text: </strong>
+          <span v-if="results.metadata?.title">
+            {{ results.metadata?.title }}
+          </span>
+          <span v-else class="text-gray-400">No Meta Title Found</span>
+        </p>
+        <p>
+          <strong>Length: </strong>
+          <span v-if="results.metadata?.title_length">
+            {{ results.metadata?.title_length }} characters
+          </span>
+          <span v-else class="text-gray-400">No Data</span>
         </p>
         <p v-if="!results.metadata?.title" class="text-red-500 font-bold">
-          ⚠️ Missing Page Title
+          ⚠️ No Meta Title detected. Ensure your page has a proper title for
+          better SEO.
         </p>
         <p
           v-if="results.metadata?.duplicate_title"
@@ -41,7 +51,10 @@
           ⚠️ Duplicate Page Title Found
         </p>
         <p
-          v-if="results.metadata?.title_length < 50"
+          v-if="
+            results.metadata?.title_length < 50 &&
+            results.metadata?.title_length > 0
+          "
           class="text-yellow-500 font-bold"
         >
           ⚠️ Title is Too Short
@@ -63,34 +76,49 @@
         </p>
       </div>
       <!-- Meta Description Validation -->
-      <div
-        class="p-4 border rounded-md"
-        :class="{
-          'text-green-600':
-            results.metadata.description_length >= 150 &&
-            results.metadata.description_length <= 220,
-          'text-red-600':
-            results.metadata.description_length < 150 ||
-            results.metadata.description_length > 220,
-        }"
-      >
-        <p class="font-semibold">
-          <span
-            class="font-bold"
-            :class="
-              results.metadata.description_length >= 150 &&
-              results.metadata.description_length <= 220
-                ? 'text-green-500'
-                : 'text-yellow-500'
-            "
-          >
-            ✅ Meta Description Test
-          </span>
-        </p>
-        <p><strong>Text:</strong> {{ results.metadata.description }}</p>
+      <div class="p-3 border-b bg-white shadow-md rounded-md">
+        <p class="font-bold">Meta Description Test</p>
         <p>
-          <strong>Length:</strong>
-          {{ results.metadata.description_length }} characters
+          <strong>Text: </strong>
+          <span v-if="results.metadata?.description">
+            {{ results.metadata?.description }}
+          </span>
+          <span v-else class="text-gray-400">No Meta Description Found</span>
+        </p>
+        <p>
+          <strong>Length: </strong>
+          <span v-if="results.metadata?.description_length">
+            {{ results.metadata?.description_length }} characters
+          </span>
+          <span v-else class="text-gray-400">No Data</span>
+        </p>
+        <p v-if="!results.metadata?.description" class="text-red-500 font-bold">
+          ⚠️ No Meta Description detected. Add a brief summary of your page for
+          better SEO.
+        </p>
+        <p
+          v-if="
+            results.metadata?.description_length < 150 &&
+            results.metadata?.description_length > 0
+          "
+          class="text-yellow-500 font-bold"
+        >
+          ⚠️ Meta Description is Too Short
+        </p>
+        <p
+          v-if="results.metadata?.description_length > 220"
+          class="text-yellow-500 font-bold"
+        >
+          ⚠️ Meta Description is Too Long
+        </p>
+        <p
+          v-if="
+            results.metadata?.description_length >= 150 &&
+            results.metadata?.description_length <= 220
+          "
+          class="text-green-500 font-bold"
+        >
+          ✅ Meta Description is in the Ideal Range
         </p>
       </div>
     </div>
@@ -107,6 +135,130 @@
         <p><strong>Phone:</strong> {{ results.sop?.phone_number || "N/A" }}</p>
         <p><strong>Email:</strong> {{ results.sop?.email_address || "N/A" }}</p>
         <p><strong>Copyright:</strong> {{ results.sop?.copyright || "N/A" }}</p>
+      </div>
+    </div>
+    <div class="sop-compliance bg-white p-4 rounded-md border">
+      <h3 class="text-md font-semibold mb-2">📋 SOP Compliance</h3>
+
+      <!-- Company Name -->
+      <div class="p-3 border-b bg-white shadow-md rounded-md mb-2">
+        <p class="font-bold">Company Name</p>
+        <p>
+          <strong>Text: </strong>
+          <span v-if="results.sop?.company_name">
+            {{ results.sop?.company_name }}
+          </span>
+          <span v-else class="text-gray-400">No Company Name Found</span>
+        </p>
+      </div>
+
+      <!-- Address Validation -->
+      <div class="p-3 border-b bg-white shadow-md rounded-md mb-2">
+        <p class="font-bold">
+          Address
+          <span
+            class="tooltip"
+            title="Example: 123 Main St., Suite 200, NY 10001"
+            >ℹ️</span
+          >
+        </p>
+        <p>
+          <strong>Text: </strong>
+          <span v-if="results.sop?.address">
+            {{ results.sop?.address }}
+          </span>
+          <span v-else class="text-gray-400">No Address Found</span>
+        </p>
+        <p :class="validateAddress(results.sop?.address)">
+          <strong>Validation:</strong>
+          <span
+            v-if="validateAddress(results.sop?.address) === 'text-green-500'"
+          >
+            ✅ Address is in the correct format.
+          </span>
+          <span v-else class="text-red-500">
+            ⚠️ Address format may be incorrect. (Expected: 12345 Main St., Suite
+            100)
+          </span>
+        </p>
+      </div>
+
+      <!-- Phone Number Validation -->
+      <div class="p-3 border-b bg-white shadow-md rounded-md mb-2">
+        <p class="font-bold">
+          Phone Number
+          <span class="tooltip" title="Expected format: 123-456-7890">ℹ️</span>
+        </p>
+        <p>
+          <strong>Text: </strong>
+          <span v-if="results.sop?.phone_number">
+            {{ results.sop?.phone_number }}
+          </span>
+          <span v-else class="text-gray-400">No Phone Number Found</span>
+        </p>
+        <p :class="validatePhone(results.sop?.phone_number)">
+          <strong>Validation:</strong>
+          <span
+            v-if="validatePhone(results.sop?.phone_number) === 'text-green-500'"
+          >
+            ✅ Phone number is correctly formatted.
+          </span>
+          <span v-else class="text-red-500">
+            ⚠️ Phone number format is incorrect (Expected: 123-456-7890).
+          </span>
+        </p>
+      </div>
+
+      <!-- Email Validation -->
+      <div class="p-3 border-b bg-white shadow-md rounded-md mb-2">
+        <p class="font-bold">Email</p>
+        <p>
+          <strong>Text: </strong>
+          <span v-if="results.sop?.email_address">
+            {{ results.sop?.email_address }}
+          </span>
+          <span v-else class="text-gray-400">No Email Found</span>
+        </p>
+        <p :class="validateEmail(results.sop?.email_address)">
+          <strong>Validation:</strong>
+          <span
+            v-if="
+              validateEmail(results.sop?.email_address) === 'text-green-500'
+            "
+          >
+            ✅ Email format is correct.
+          </span>
+          <span v-else class="text-red-500">
+            ⚠️ Email format may be incorrect.
+          </span>
+        </p>
+      </div>
+
+      <!-- Copyright Validation -->
+      <div class="p-3 border-b bg-white shadow-md rounded-md">
+        <p class="font-bold">Copyright</p>
+        <p>
+          <strong>Text: </strong>
+          <span v-if="results.sop?.copyright">
+            {{ results.sop?.copyright }}
+          </span>
+          <span v-else class="text-gray-400"
+            >No Copyright Information Found</span
+          >
+        </p>
+        <p :class="validateCopyright(results.sop?.copyright)">
+          <strong>Validation:</strong>
+          <span
+            v-if="
+              validateCopyright(results.sop?.copyright) === 'text-green-500'
+            "
+          >
+            ✅ Copyright year is correct.
+          </span>
+          <span v-else class="text-red-500">
+            ⚠️ Copyright year may be outdated.
+          </span>
+        </p>
       </div>
     </div>
 
@@ -376,6 +528,36 @@ export default {
       return explanations[issue.message] || "No explanation provided.";
     },
 
+    // Address Validation (Basic Check for Format)
+    validateAddress(address) {
+      if (!address) return "text-red-500";
+      const addressPattern =
+        /\d+.*\b(?:Ave\.|Blvd\.|St\.|Hwy\.|Rd\.|Ln\.|Fwy\.|Ct\.|Dr\.|Pkwy\.|Bldg\.|Fl\.|Ste\.|NW|NE|SW|SE|N|S|E|W)\b/i;
+      return addressPattern.test(address) ? "text-green-500" : "text-red-500";
+    },
+
+    // Phone Number Validation (Must follow XXX-XXX-XXXX)
+    validatePhone(phone) {
+      if (!phone) return "text-red-500";
+      const phonePattern = /^\d{3}-\d{3}-\d{4}$/;
+      return phonePattern.test(phone) ? "text-green-500" : "text-red-500";
+    },
+
+    // Email Validation (Basic Format Check)
+    validateEmail(email) {
+      if (!email) return "text-red-500";
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      return emailPattern.test(email) ? "text-green-500" : "text-red-500";
+    },
+
+    // Copyright Validation (Should be Current Year)
+    validateCopyright(copyright) {
+      const currentYear = new Date().getFullYear();
+      return copyright && copyright.includes(currentYear.toString())
+        ? "text-green-500"
+        : "text-red-500";
+    },
+
     handleScroll() {
       this.showBackToTop = window.scrollY > 300; // Show button after scrolling down
     },
@@ -417,6 +599,12 @@ export default {
 </script>
 
 <style scoped>
+.tooltip {
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  margin-left: 5px;
+}
 .border-red-500 {
   border-left-width: 5px;
 }
