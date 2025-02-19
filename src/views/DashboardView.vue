@@ -2,7 +2,7 @@
   <div class="flex flex-col lg:flex-row p-6">
     <!-- Sidebar -->
     <div
-      class="lg:w-1/4 w-full bg-white shadow-md lg:relative fixed inset-y-0 left-0 z-10 h-full overflow-y-auto"
+      class="lg:w-1/4 w-full shadow-md lg:relative fixed inset-y-0 left-0 z-10 h-full overflow-y-auto"
     >
       <HistorySidebar
         :history="history"
@@ -13,7 +13,7 @@
 
     <!-- Main Content -->
     <div
-      class="lg:w-3/4 w-full flex-1 p-4 lg:ml-1/4 container mx-auto space-y-6"
+      class="lg:w-3/4 w-full flex-1 p-4 pt-0 lg:ml-1/4 container mx-auto space-y-6"
     >
       <SubNavigation />
       <WebsiteInput
@@ -21,10 +21,10 @@
         @results="handleResults"
         v-model="websiteUrl"
       />
-      <ExportButtons v-if="results" :results="results" />
+      <!-- <ExportButtons v-if="results" :results="results" /> -->
 
       <!-- Tabs -->
-      <div>
+      <div v-if="results">
         <div class="tabs flex space-x-4 border-b">
           <button
             v-for="tab in tabs"
@@ -48,8 +48,26 @@
       <!-- <div v-if="activeTab === 'Content Analysis'">
         <p class="text-gray-700">Content Analysis feature coming soon...</p>
       </div> -->
+      <!-- Placeholder Image (Only Show When No Results Exist) -->
+      <div v-if="!results" class="flex justify-center items-center mt-10">
+        <img
+          src="@/assets/Web-search.gif"
+          alt="Start Scanning"
+          class="w-1/3 opacity-75"
+        />
+      </div>
     </div>
   </div>
+  <!-- ✅ Footer -->
+  <footer class="bg-gray-100 text-center py-4 text-sm text-gray-600">
+    © {{ currentYear }} Web Diagnostic Tool | by
+    <a
+      href="https://www.proweaver.com/"
+      target="_blank"
+      class="text-blue-500 hover:underline"
+      >Proweaver</a
+    >
+  </footer>
 </template>
 
 <script>
@@ -65,7 +83,7 @@ export default {
     SubNavigation,
     WebsiteInput,
     ValidationResults,
-    ExportButtons,
+    // ExportButtons,
     HistorySidebar,
   },
   data() {
@@ -76,6 +94,7 @@ export default {
       tabs: ["Results"],
       activeTab: "Results",
       history: {},
+      currentYear: new Date().getFullYear(), //Auto Update na ni nga Copyright
     };
   },
   mounted() {

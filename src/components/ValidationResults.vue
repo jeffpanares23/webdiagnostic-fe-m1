@@ -331,6 +331,7 @@
 
     <!-- Metadata Issues Section -->
     <div
+      v-if="metadataIssues.length > 0"
       ref="metadataIssues"
       class="metadata-issues bg-white p-4 rounded-md border mt-4"
       :class="{
@@ -379,6 +380,7 @@
 
     <!-- SOP Compliance Issues Section -->
     <div
+      v-if="sopIssues.length > 0"
       ref="sopIssues"
       class="sop-issues bg-white p-4 rounded-md border mt-4"
       :class="{ 'highlight-section': highlight === 'sop' }"

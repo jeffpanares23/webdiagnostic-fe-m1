@@ -12,9 +12,33 @@
       <button
         type="button"
         @click="submitUrl"
-        class="bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 transition"
+        class="bg-blue-500 text-white py-3 px-6 rounded-lg flex items-center justify-center transition"
+        :disabled="loading"
       >
-        GO!
+        <span v-if="!loading">GO!</span>
+        <span v-else class="flex items-center">
+          <svg
+            class="animate-spin h-5 w-5 mr-2 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+          Loading...
+        </span>
       </button>
     </div>
     <p v-if="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
@@ -31,6 +55,7 @@ export default {
   data() {
     return {
       errorMessage: "",
+      loading: false,
     };
   },
   computed: {
@@ -46,11 +71,13 @@ export default {
   methods: {
     async submitUrl() {
       this.errorMessage = "";
+      this.loading = true;
       this.$emit("loading"); // Trigger loading state in parent component
 
       // Ensure websiteUrl is defined and not empty
       if (!this.websiteUrl || this.websiteUrl.trim() === "") {
         this.errorMessage = "Please enter a valid URL.";
+        this.loading = false; // Stop loading state if input is empty
         return;
       }
 
@@ -85,6 +112,8 @@ export default {
           error.response?.data?.error ||
           "An error occurred while processing the URL.";
         console.error("API Error:", error);
+      } finally {
+        this.loading = false; // ✅ Stop loading state after API call
       }
     },
   },
