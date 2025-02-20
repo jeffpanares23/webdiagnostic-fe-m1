@@ -533,9 +533,25 @@ export default {
     // Address Validation (Basic Check for Format)
     validateAddress(address) {
       if (!address) return "text-red-500";
+
+      // Define valid address patterns
       const addressPattern =
-        /\d+.*\b(?:Ave\.|Blvd\.|St\.|Hwy\.|Rd\.|Ln\.|Fwy\.|Ct\.|Dr\.|Pkwy\.|Bldg\.|Fl\.|Ste\.|NW|NE|SW|SE|N|S|E|W)\b/i;
-      return addressPattern.test(address) ? "text-green-500" : "text-red-500";
+        /\b(?:Address|Location|Visit Us|Office|Headquarters|Suite|Street|Road|Ave|Blvd|Drive|Way):?\s*([\w\s,.-]+)/i;
+      const structuredAddressPattern =
+        /^\d{1,5}\s[A-Za-z\s]+,\s*[A-Za-z\s]+,\s*[A-Za-z\s]+(?:\s\d{5})?$/;
+      const usAddressPattern =
+        /^\d{1,5}\s[\w\s]+,\s[\w\s]+,\s[A-Z]{2}\s[0-9]{5}$/;
+
+      // Validate against multiple address formats
+      if (
+        addressPattern.test(address) ||
+        structuredAddressPattern.test(address) ||
+        usAddressPattern.test(address)
+      ) {
+        return "text-green-500"; // ✅ Address is valid
+      }
+
+      return "text-red-500"; // ⚠️ Address format may be incorrect
     },
 
     // Phone Number Validation (Must follow XXX-XXX-XXXX)
