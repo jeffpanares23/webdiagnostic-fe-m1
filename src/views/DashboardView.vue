@@ -21,7 +21,6 @@
         @results="handleResults"
         v-model="websiteUrl"
       />
-      <!-- <ExportButtons v-if="results" :results="results" /> -->
 
       <!-- Tabs -->
       <div v-if="results">
@@ -44,6 +43,7 @@
       <!-- Tab Content -->
       <div v-if="activeTab === 'Results'">
         <ValidationResults v-if="results" :results="results" />
+        <ExportButtons v-if="results" :results="results" />
       </div>
       <!-- <div v-if="activeTab === 'Content Analysis'">
         <p class="text-gray-700">Content Analysis feature coming soon...</p>
@@ -83,7 +83,7 @@ export default {
     SubNavigation,
     WebsiteInput,
     ValidationResults,
-    // ExportButtons,
+    ExportButtons,
     HistorySidebar,
   },
   data() {

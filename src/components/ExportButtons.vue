@@ -1,14 +1,11 @@
 <template>
-  <div class="flex space-x-4">
-    <!-- Export as PDF -->
+  <div class="flex justify-center space-x-4 py-4">
     <button
       class="px-4 py-2 bg-blue-500 text-white rounded-lg"
       @click="exportAsPDF"
     >
       Export as PDF
     </button>
-
-    <!-- Export as CSV -->
     <button
       class="px-4 py-2 bg-green-500 text-white rounded-lg"
       @click="exportAsCSV"
@@ -23,50 +20,143 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 export default {
-  props: ["results"], // Ensure results are passed as a prop
+  props: ["results"], // ✅ Ensure results are passed as a prop
   methods: {
-    // Export Results as PDF
+    // ✅ Export as PDF (Nicely Formatted)
     exportAsPDF() {
       const doc = new jsPDF();
-      doc.setFontSize(14);
-      doc.text("Validation Results", 10, 10);
+      doc.setFontSize(16);
+      doc.text("Website Diagnostic Report", 10, 10);
+      doc.setFontSize(12);
 
-      if (Array.isArray(this.results)) {
+      // ✅ Metadata Validation
+      if (this.results.metadata) {
+        doc.text("Metadata Validation", 10, 20);
         doc.autoTable({
-          head: [["Key", "Value"]],
-          body: this.results.map((item) => Object.entries(item)),
+          startY: 25,
+          head: [["Field", "Value"]],
+          body: [
+            ["Meta Title", this.results.metadata.title || "N/A"],
+            [
+              "Title Length",
+              `${this.results.metadata.title_length} characters` || "N/A",
+            ],
+            ["Meta Description", this.results.metadata.description || "N/A"],
+            [
+              "Description Length",
+              `${this.results.metadata.description_length} characters` || "N/A",
+            ],
+          ],
         });
-      } else {
-        doc.text(JSON.stringify(this.results, null, 2), 10, 20);
       }
 
-      doc.save("results.pdf");
+      // ✅ SOP Compliance
+      if (this.results.sop) {
+        doc.text("SOP Compliance", 10, doc.autoTable.previous.finalY + 10);
+        doc.autoTable({
+          startY: doc.autoTable.previous.finalY + 15,
+          head: [["Field", "Value"]],
+          body: [
+            ["Company Name", this.results.sop.company_name || "N/A"],
+            ["Address", this.results.sop.address || "N/A"],
+            ["Phone", this.results.sop.phone_number || "N/A"],
+            ["Email", this.results.sop.email_address || "N/A"],
+            ["Copyright", this.results.sop.copyright || "N/A"],
+          ],
+        });
+      }
+
+      // ✅ SEO Checks
+      if (this.results.seo_checks) {
+        doc.text("SEO Checks", 10, doc.autoTable.previous.finalY + 10);
+        doc.autoTable({
+          startY: doc.autoTable.previous.finalY + 15,
+          head: [["Field", "Value"]],
+          body: [
+            ["Has HTTPS", this.results.seo_checks.hasHttps ? "Yes" : "No"],
+          ],
+        });
+      }
+
+      // ✅ Issues to Fix
+      if (this.results.issues && this.results.issues.length > 0) {
+        doc.text("Issues to Fix", 10, doc.autoTable.previous.finalY + 10);
+        doc.autoTable({
+          startY: doc.autoTable.previous.finalY + 15,
+          head: [["Priority", "Issue"]],
+          body: this.results.issues.map((issue) => [
+            issue.priority,
+            issue.message,
+          ]),
+        });
+      }
+
+      doc.save("Website_Diagnostic_Report.pdf");
     },
 
-    // Export Results as CSV
+    // ✅ Export as CSV (Nicely Structured)
     exportAsCSV() {
       const csvRows = [];
 
-      // Generate CSV headers
-      if (Array.isArray(this.results) && this.results.length > 0) {
-        csvRows.push(Object.keys(this.results[0]).join(","));
-        this.results.forEach((row) => {
-          csvRows.push(Object.values(row).join(","));
-        });
-      } else if (typeof this.results === "object") {
-        csvRows.push(Object.keys(this.results).join(","));
-        csvRows.push(Object.values(this.results).join(","));
-      } else {
-        csvRows.push("Results");
-        csvRows.push(this.results);
+      // ✅ Metadata Section
+      if (this.results.metadata) {
+        csvRows.push("Metadata Validation");
+        csvRows.push("Field,Value");
+        csvRows.push(`Meta Title,${this.results.metadata.title || "N/A"}`);
+        csvRows.push(
+          `Title Length,${
+            this.results.metadata.title_length || "N/A"
+          } characters`
+        );
+        csvRows.push(
+          `Meta Description,${this.results.metadata.description || "N/A"}`
+        );
+        csvRows.push(
+          `Description Length,${
+            this.results.metadata.description_length || "N/A"
+          } characters`
+        );
+        csvRows.push(""); // Add a space
       }
 
+      // ✅ SOP Compliance Section
+      if (this.results.sop) {
+        csvRows.push("SOP Compliance");
+        csvRows.push("Field,Value");
+        csvRows.push(`Company Name,${this.results.sop.company_name || "N/A"}`);
+        csvRows.push(`Address,${this.results.sop.address || "N/A"}`);
+        csvRows.push(`Phone,${this.results.sop.phone_number || "N/A"}`);
+        csvRows.push(`Email,${this.results.sop.email_address || "N/A"}`);
+        csvRows.push(`Copyright,${this.results.sop.copyright || "N/A"}`);
+        csvRows.push(""); // Add a space
+      }
+
+      // ✅ SEO Checks Section
+      if (this.results.seo_checks) {
+        csvRows.push("SEO Checks");
+        csvRows.push("Field,Value");
+        csvRows.push(
+          `Has HTTPS,${this.results.seo_checks.hasHttps ? "Yes" : "No"}`
+        );
+        csvRows.push(""); // Add a space
+      }
+
+      // ✅ Issues to Fix Section
+      if (this.results.issues && this.results.issues.length > 0) {
+        csvRows.push("Issues to Fix");
+        csvRows.push("Priority,Issue");
+        this.results.issues.forEach((issue) => {
+          csvRows.push(`${issue.priority},${issue.message}`);
+        });
+      }
+
+      // ✅ Create and Download CSV File
       const csvContent = csvRows.join("\n");
       const blob = new Blob([csvContent], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "results.csv";
+      a.download = "Website_Diagnostic_Report.csv";
       a.click();
       URL.revokeObjectURL(url);
     },
