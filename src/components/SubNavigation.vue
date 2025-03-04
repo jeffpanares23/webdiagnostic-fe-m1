@@ -10,7 +10,7 @@
     </div>
 
     <!-- Search Bar -->
-    <div class="search-bar flex items-center">
+    <!-- <div class="search-bar flex items-center">
       <input
         type="text"
         v-model="searchQuery"
@@ -23,7 +23,7 @@
       >
         Search
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 

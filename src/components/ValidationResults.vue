@@ -98,6 +98,7 @@
         </p>
         <p
           v-if="
+            results.metadata?.description &&
             results.metadata?.description_length < 150 &&
             results.metadata?.description_length > 0
           "
@@ -113,6 +114,7 @@
         </p>
         <p
           v-if="
+            results.metadata?.description &&
             results.metadata?.description_length >= 150 &&
             results.metadata?.description_length <= 220
           "
@@ -267,7 +269,7 @@
       <h3 class="text-md font-semibold mb-2">🔍 SEO Checks</h3>
       <ul class="list-disc list-inside text-gray-700">
         <li>
-          <strong>Has HTTPS:</strong>
+          <strong>Has HTTPS: </strong>
           <span
             :class="
               results.seo_checks?.hasHttps ? 'text-green-500' : 'text-red-500'
@@ -275,7 +277,7 @@
             >{{ results.seo_checks?.hasHttps ? "Yes" : "No" }}</span
           >
         </li>
-        <li>
+        <!-- <li>
           <strong>Mobile Responsive:</strong>
           <span
             :class="
@@ -285,49 +287,46 @@
             "
             >{{ results.seo_checks?.mobileResponsive ? "Yes" : "No" }}</span
           >
-        </li>
+        </li> -->
       </ul>
     </div>
 
     <!-- Issues to Fix Section -->
-    <div class="issues-to-fix bg-white p-4 rounded-md border">
-      <h3 class="text-md font-semibold mb-2">🚨 Issues to Fix</h3>
-      <div v-if="hasIssues" class="space-y-3">
-        <div
-          v-for="(issue, index) in results.issues"
-          :key="index"
-          class="flex items-center p-3 border-l-4 rounded-md shadow-sm transition-all duration-200 hover:shadow-lg cursor-pointer"
+    <div v-if="filteredIssues.length > 0" class="space-y-3">
+      <div
+        v-for="(issue, index) in filteredIssues"
+        :key="index"
+        class="flex items-center p-3 border-l-4 rounded-md shadow-sm transition-all duration-200 hover:shadow-lg cursor-pointer"
+        :class="{
+          'bg-red-50 border-red-500': issue.priority === 'HIGH',
+          'bg-yellow-50 border-yellow-500': issue.priority === 'MEDIUM',
+          'bg-green-50 border-green-500': issue.priority === 'LOW',
+        }"
+        @click="scrollToSection(issue.section)"
+      >
+        <!-- Priority Label -->
+        <span
+          class="text-xs font-bold px-3 py-1 min-w-20 text-center rounded"
           :class="{
-            'bg-red-50 border-red-500': issue.priority === 'HIGH',
-            'bg-yellow-50 border-yellow-500': issue.priority === 'MEDIUM',
-            'bg-green-50 border-green-500': issue.priority === 'LOW',
+            'bg-red-500 text-white': issue.priority === 'HIGH',
+            'bg-yellow-500 text-white': issue.priority === 'MEDIUM',
+            'bg-green-500 text-white': issue.priority === 'LOW',
           }"
-          @click="scrollToSection(issue.section)"
         >
-          <!-- Priority Label -->
-          <span
-            class="text-xs font-bold px-3 py-1 min-w-20 text-center rounded"
-            :class="{
-              'bg-red-500 text-white': issue.priority === 'HIGH',
-              'bg-yellow-500 text-white': issue.priority === 'MEDIUM',
-              'bg-green-500 text-white': issue.priority === 'LOW',
-            }"
-          >
-            {{ issue.priority }}
-          </span>
+          {{ issue.priority }}
+        </span>
 
-          <!-- Issue Message -->
-          <p class="ml-4 text-gray-700 flex items-center">
-            <a class="hover:text-blue-700">
-              {{ issue.message }}
-            </a>
-          </p>
-        </div>
+        <!-- Issue Message -->
+        <p class="ml-4 text-gray-700 flex items-center">
+          <a class="hover:text-blue-700">
+            {{ issue.message }}
+          </a>
+        </p>
       </div>
-
-      <!-- Ensure fallback message if no issues are detected -->
-      <p v-else class="text-gray-500">✅ No critical issues found.</p>
     </div>
+
+    <!-- ✅ No issues found message -->
+    <p v-else class="text-gray-500">✅ No critical issues found.</p>
 
     <!-- Metadata Issues Section -->
     <div
@@ -604,6 +603,18 @@ export default {
     // sopIssues() {
     //   return this.sortedIssues.filter((issue) => issue.section === "sop");
     // },
+    filteredIssues() {
+      return this.results.issues.filter((issue) => {
+        // ✅ Exclude meta description issues if no description exists
+        if (
+          issue.message.includes("Meta description") &&
+          !this.results.metadata?.description
+        ) {
+          return false;
+        }
+        return true; // ✅ Keep all other issues
+      });
+    },
     metadataIssues() {
       return this.results.issues.filter(
         (issue) => issue.section === "metadata"
