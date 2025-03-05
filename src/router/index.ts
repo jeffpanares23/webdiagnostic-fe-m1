@@ -1,13 +1,15 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import DashboardView from "@/views/DashboardView.vue";
+import Login from "@/views/Login.vue";
 
 // Define Routes
 const routes: Array<RouteRecordRaw> = [
-  // { path: "/", name: "Login", component: Login },
+  { path: "/", name: "Login", component: Login },
   {
-    path: "/",
+    path: "/dashboard",
     name: "DiagnosticDashboard",
     component: DashboardView,
+    meta: { requiresAuth: true, title: "Dashboard" },
   },
   // // Not Found Page
   // {
@@ -21,14 +23,18 @@ const routes: Array<RouteRecordRaw> = [
 
 // Create Router Instance
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  // history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(),
   routes,
 });
 
 // Add Navigation Guards
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("token");
-  // const isAuthenticated = localStorage.getItem("token"); // Example Auth Check
+  const title = (to.meta.title as string) || "Default Title"; // Explicitly cast to string
+  document.title = title;
+  const token = sessionStorage.getItem("token");
+
+  // const isAuthenticated = sessionStorage.getItem("token"); // Example Auth Check
 
   // Check meta.requiresAuth for protected routes
   // if (to.meta.requiresAuth && !isAuthenticated) {

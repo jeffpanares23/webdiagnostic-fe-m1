@@ -98,61 +98,74 @@ export default {
     exportAsCSV() {
       const csvRows = [];
 
+      // ✅ Add Header
+      csvRows.push('"Website Diagnostic Report"');
+      csvRows.push(""); // Empty row for spacing
+
       // ✅ Metadata Section
       if (this.results.metadata) {
-        csvRows.push("Metadata Validation");
+        csvRows.push('"METADATA VALIDATION"');
         csvRows.push("Field,Value");
-        csvRows.push(`Meta Title,${this.results.metadata.title || "N/A"}`);
+        csvRows.push(`Meta Title,"${this.results.metadata.title || "N/A"}"`);
         csvRows.push(
-          `Title Length,${
+          `Title Length,"${
             this.results.metadata.title_length || "N/A"
-          } characters`
+          } characters"`
         );
         csvRows.push(
-          `Meta Description,${this.results.metadata.description || "N/A"}`
+          `Meta Description,"${this.results.metadata.description || "N/A"}"`
         );
         csvRows.push(
-          `Description Length,${
+          `Description Length,"${
             this.results.metadata.description_length || "N/A"
-          } characters`
+          } characters"`
         );
-        csvRows.push(""); // Add a space
+        csvRows.push(""); // Empty row for spacing
       }
 
       // ✅ SOP Compliance Section
       if (this.results.sop) {
-        csvRows.push("SOP Compliance");
+        csvRows.push('"SOP COMPLIANCE"');
         csvRows.push("Field,Value");
-        csvRows.push(`Company Name,${this.results.sop.company_name || "N/A"}`);
-        csvRows.push(`Address,${this.results.sop.address || "N/A"}`);
-        csvRows.push(`Phone,${this.results.sop.phone_number || "N/A"}`);
-        csvRows.push(`Email,${this.results.sop.email_address || "N/A"}`);
-        csvRows.push(`Copyright,${this.results.sop.copyright || "N/A"}`);
-        csvRows.push(""); // Add a space
+        csvRows.push(
+          `Company Name,"${this.results.sop.company_name || "N/A"}"`
+        );
+        csvRows.push(`Address,"${this.results.sop.address || "N/A"}"`);
+        csvRows.push(`Phone,"${this.results.sop.phone_number || "N/A"}"`);
+        csvRows.push(`Email,"${this.results.sop.email_address || "N/A"}"`);
+        csvRows.push(`Copyright,"${this.results.sop.copyright || "N/A"}"`);
+        csvRows.push(""); // Empty row for spacing
       }
 
       // ✅ SEO Checks Section
       if (this.results.seo_checks) {
-        csvRows.push("SEO Checks");
+        csvRows.push('"SEO CHECKS"');
         csvRows.push("Field,Value");
         csvRows.push(
           `Has HTTPS,${this.results.seo_checks.hasHttps ? "Yes" : "No"}`
         );
-        csvRows.push(""); // Add a space
+        csvRows.push(""); // Empty row for spacing
       }
 
       // ✅ Issues to Fix Section
       if (this.results.issues && this.results.issues.length > 0) {
-        csvRows.push("Issues to Fix");
+        csvRows.push('"ISSUES TO FIX"');
         csvRows.push("Priority,Issue");
+
         this.results.issues.forEach((issue) => {
-          csvRows.push(`${issue.priority},${issue.message}`);
+          const priorityText =
+            issue.priority === "HIGH"
+              ? "[HIGH]"
+              : issue.priority === "MEDIUM"
+              ? "[MEDIUM]"
+              : "[LOW]";
+          csvRows.push(`"${priorityText}","${issue.message}"`);
         });
       }
 
       // ✅ Create and Download CSV File
       const csvContent = csvRows.join("\n");
-      const blob = new Blob([csvContent], { type: "text/csv" });
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

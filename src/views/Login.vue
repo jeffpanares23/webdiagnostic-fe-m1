@@ -10,9 +10,9 @@
           <form @submit.prevent="handleLogin" class="w-full">
             <div class="mb-4">
               <input
-                type="email"
+                type="text"
                 v-model="email"
-                placeholder="Email"
+                placeholder="Email or Username"
                 class="w-full px-4 py-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 required
               />
@@ -78,7 +78,7 @@
 
     <!-- Right: Illustration and Metrics -->
     <div class="flex-1 hidden lg:flex flex-col justify-center items-center p-8">
-      <h3 class="text-xl font-semibold mb-4">Digital Marketing Suite</h3>
+      <h3 class="text-xl font-semibold mb-4">Website Diagnostic Tool</h3>
       <div class="relative w-4/5">
         <img
           src="../assets/DMSuite_Login_Illustration.svg"
@@ -140,10 +140,19 @@ export default {
           email: this.email,
           password: this.password,
         });
+        console.log(response.data);
 
-        localStorage.setItem("token", response.data.token);
+        sessionStorage.setItem("token", response.data.token);
 
-        this.router.push("/overview");
+        this.router.push("/dashboard");
+        // Check the email domain and redirect accordingly
+        // if (this.email.endsWith("@proweaver.net")) {
+        //   window.location.href =
+        //     "https://bdt.proweaver.tools/task-management-tool/#/task-dashboard";
+        // } else {
+        //   window.location.href =
+        //     "https://bdt.proweaver.tools/dm-suite/#/overview";
+        // }
       } catch (error) {
         console.error(
           "Login error:",
