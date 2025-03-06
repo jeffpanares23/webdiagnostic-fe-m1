@@ -20,7 +20,7 @@ export default {
     const route = useRoute();
 
     // ✅ Check if user is authenticated
-    const isAuthenticated = computed(() => !!localStorage.getItem("token"));
+    const isAuthenticated = computed(() => !!sessionStorage.getItem("token"));
     // Show SideNavigation and Header only if the route is not '/login'
     const showSideNavigation = computed(() => route.path !== "/");
     // State for collapsing SideNavigation

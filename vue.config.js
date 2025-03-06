@@ -3,6 +3,7 @@ const webpack = require("webpack");
 
 module.exports = defineConfig({
   transpileDependencies: true,
+  publicPath: "/web-diagnostic-tool/",
   configureWebpack: {
     plugins: [
       new webpack.DefinePlugin({
