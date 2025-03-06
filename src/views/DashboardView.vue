@@ -102,13 +102,31 @@ export default {
   },
   methods: {
     async fetchHistory() {
+      const token = sessionStorage.getItem("token");
+      console.log("Token:", token);
+
+      if (!token) {
+        this.errorMessage = "You are not authenticated. Please log in.";
+        this.loading = false;
+        return;
+      }
+
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/api/diagnostic-history"
+          "http://127.0.0.1:8000/api/diagnostic-history",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
+        console.log(response.data);
         this.history = response.data;
       } catch (error) {
-        console.error("Failed to fetch history:", error);
+        console.error(
+          "Failed to fetch history:",
+          error.response?.data || error
+        );
       }
     },
     handleHistorySelect(selectedResult) {

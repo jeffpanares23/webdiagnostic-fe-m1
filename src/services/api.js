@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "https://bdt.proweaver.tools/dm-suite-api/public";
+const baseUrl = "http://127.0.0.1:8000";
 // Set up a base URL for your backend API
 const apiClient = axios.create({
   baseURL: `${baseUrl}/api/auth`, // Update with your backend URL

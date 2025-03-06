@@ -143,6 +143,7 @@ export default {
         console.log(response.data);
 
         sessionStorage.setItem("token", response.data.token);
+        sessionStorage.setItem("user_id", response.data.user.id);
 
         this.router.push("/dashboard");
         // Check the email domain and redirect accordingly

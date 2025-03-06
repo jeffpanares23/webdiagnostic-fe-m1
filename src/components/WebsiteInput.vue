@@ -86,10 +86,24 @@ export default {
         formattedUrl = "http://" + formattedUrl; // ✅ Ensure protocol exists
       }
 
+      const token = sessionStorage.getItem("token");
+      console.log(token);
+
+      if (!token) {
+        this.errorMessage = "You are not authenticated. Please log in.";
+        this.loading = false;
+        return;
+      }
+
       try {
         const response = await axios.post(
           "http://127.0.0.1:8000/api/analyze-website",
-          { url: formattedUrl }
+          { url: formattedUrl },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         if (!response.data || response.data.error) {
@@ -97,6 +111,8 @@ export default {
             response.data.error || "Invalid response from server."
           );
         }
+
+        console.log(response.data);
 
         const processedData = {
           url: formattedUrl,
