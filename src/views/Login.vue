@@ -142,8 +142,13 @@ export default {
         });
         console.log(response.data);
 
+        const user = response.data.user || response.data.data?.data;
+        if (!user) {
+          throw new Error("User data missing in response");
+        }
+        console.log("user_id", user.id);
         sessionStorage.setItem("token", response.data.token);
-        sessionStorage.setItem("user_id", response.data.user.id);
+        sessionStorage.setItem("user_id", user.id);
 
         this.router.push("/dashboard");
         // Check the email domain and redirect accordingly
