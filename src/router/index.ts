@@ -4,7 +4,13 @@ import Login from "@/views/Login.vue";
 
 // Define Routes
 const routes: Array<RouteRecordRaw> = [
-  { path: "/", name: "Login", component: Login },
+  {
+    path: "/",
+    name: "Login",
+    component: Login,
+    meta: { title: "Website Diagnostic Tool | Login" },
+  },
+
   {
     path: "/dashboard",
     name: "DiagnosticDashboard",
@@ -18,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
   //   component: () =>
   //     import(/* webpackChunkName: "not-found" */ "@/views/NotFound.vue"),
   // },
-  { path: "/:pathMatch(.*)*", redirect: "/404" },
+  { path: "/:pathMatch(.*)*", meta: { title: "404 Page" }, redirect: "/404" },
 ];
 
 // Create Router Instance

@@ -113,7 +113,7 @@ export default {
 
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/api/diagnostic-history",
+          "https://bdt.proweaver.tools/web-diagnostic-api/public/api/diagnostic-history",
           {
             headers: {
               Authorization: `Bearer ${token}`,
