@@ -1,6 +1,6 @@
 import axios from "axios";
-const baseUrl = "https://bdt.proweaver.tools/web-diagnostic-api/public";
-// Set up a base URL for your backend API
+import baseUrl from "../config";
+
 const apiClient = axios.create({
   baseURL: `${baseUrl}/api/auth`, // Update with your backend URL
   headers: {

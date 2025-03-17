@@ -4,6 +4,16 @@
     <div class="main-content flex-1 bg-gradient-to-r from-gray-100 to-blue-50">
       <router-view />
     </div>
+    <!-- ✅ Footer -->
+    <footer class="bg-gray-100 text-center py-4 text-sm text-gray-600">
+      © {{ currentYear }} Web Diagnostic Tool | by
+      <a
+        href="https://www.proweaver.com/"
+        target="_blank"
+        class="text-blue-500 hover:underline"
+        >Proweaver</a
+      >
+    </footer>
   </div>
 </template>
 
@@ -20,7 +30,7 @@ export default {
     const route = useRoute();
 
     // ✅ Check if user is authenticated
-    const isAuthenticated = computed(() => !!sessionStorage.getItem("token"));
+    const isAuthenticated = computed(() => !!localStorage.getItem("token"));
     // Show SideNavigation and Header only if the route is not '/login'
     const showSideNavigation = computed(() => route.path !== "/");
     // State for collapsing SideNavigation

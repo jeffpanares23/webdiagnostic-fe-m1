@@ -27,15 +27,15 @@
 
     <!-- Logout Icon (Hidden if Embedded) -->
     <div v-if="!isEmbedded" class="relative group">
-      <button @click="logout" class="text-gray-600 hover:text-red-500">
+      <button
+        @click="logout"
+        class="text-gray-600 hover:text-red-500"
+        content="Logout"
+        v-tippy="{ placement: 'left' }"
+      >
         <i class="fas fa-sign-out-alt text-2xl"></i>
       </button>
       <!-- Tooltip -->
-      <div
-        class="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded shadow-md"
-      >
-        Logout
-      </div>
     </div>
   </div>
 </template>
@@ -56,7 +56,7 @@ export default {
       console.log("Searching for:", this.searchQuery);
     },
     logout() {
-      sessionStorage.removeItem("token"); // Clear authentication token
+      localStorage.removeItem("token"); // Clear authentication token
       this.$router.push("/"); // Redirect to login page
     },
   },

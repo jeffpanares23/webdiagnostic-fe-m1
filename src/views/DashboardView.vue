@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col lg:flex-row p-6">
+  <div class="flex flex-col lg:flex-row p-6 max-w-7xl m-auto">
     <!-- Sidebar -->
     <div
       class="lg:w-1/4 w-full shadow-md lg:relative fixed inset-y-0 left-0 z-10 h-full overflow-y-auto"
@@ -58,16 +58,6 @@
       </div>
     </div>
   </div>
-  <!-- ✅ Footer -->
-  <footer class="bg-gray-100 text-center py-4 text-sm text-gray-600">
-    © {{ currentYear }} Web Diagnostic Tool | by
-    <a
-      href="https://www.proweaver.com/"
-      target="_blank"
-      class="text-blue-500 hover:underline"
-      >Proweaver</a
-    >
-  </footer>
 </template>
 
 <script>
@@ -77,7 +67,7 @@ import ValidationResults from "../components/ValidationResults.vue";
 import ExportButtons from "../components/ExportButtons.vue";
 import HistorySidebar from "../components/HistorySidebar.vue";
 import axios from "axios";
-
+import baseUrl from "../config";
 export default {
   components: {
     SubNavigation,
@@ -102,7 +92,7 @@ export default {
   },
   methods: {
     async fetchHistory() {
-      const token = sessionStorage.getItem("token");
+      const token = localStorage.getItem("token");
       console.log("Token:", token);
 
       if (!token) {
@@ -112,14 +102,11 @@ export default {
       }
 
       try {
-        const response = await axios.get(
-          "https://bdt.proweaver.tools/web-diagnostic-api/public/api/diagnostic-history",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${baseUrl}/api/diagnostic-history`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         console.log(response.data);
         this.history = response.data;
       } catch (error) {

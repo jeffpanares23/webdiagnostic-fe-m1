@@ -4,13 +4,7 @@ import Login from "@/views/Login.vue";
 
 // Define Routes
 const routes: Array<RouteRecordRaw> = [
-  {
-    path: "/",
-    name: "Login",
-    component: Login,
-    meta: { title: "Website Diagnostic Tool | Login" },
-  },
-
+  { path: "/", name: "Login", component: Login },
   {
     path: "/dashboard",
     name: "DiagnosticDashboard",
@@ -24,7 +18,7 @@ const routes: Array<RouteRecordRaw> = [
   //   component: () =>
   //     import(/* webpackChunkName: "not-found" */ "@/views/NotFound.vue"),
   // },
-  { path: "/:pathMatch(.*)*", meta: { title: "404 Page" }, redirect: "/404" },
+  { path: "/:pathMatch(.*)*", redirect: "/404" },
 ];
 
 // Create Router Instance
@@ -38,9 +32,9 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const title = (to.meta.title as string) || "Default Title"; // Explicitly cast to string
   document.title = title;
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-  // const isAuthenticated = sessionStorage.getItem("token"); // Example Auth Check
+  // const isAuthenticated = localStorage.getItem("token"); // Example Auth Check
 
   // Check meta.requiresAuth for protected routes
   // if (to.meta.requiresAuth && !isAuthenticated) {

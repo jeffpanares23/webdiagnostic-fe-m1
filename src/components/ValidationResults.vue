@@ -378,8 +378,6 @@
     </div>
 
     <!-- SOP Compliance Issues Section -->
-    <!-- SOP Compliance Issues Section -->
-
     <div
       v-if="sopIssues.length > 0"
       ref="sopIssues"
@@ -387,7 +385,6 @@
       :class="{ 'highlight-section': highlight === 'sop' }"
     >
       <h3 class="text-md font-semibold mb-2">🏢 SOP Compliance Issues</h3>
-
       <div v-if="sopIssues.length > 0" class="space-y-3">
         <div
           v-for="(issue, index) in sopIssues"
@@ -396,41 +393,31 @@
           class="p-4 border rounded-md shadow-sm transition-all duration-300"
           :class="{
             'border-red-500 bg-red-50': issue.priority === 'HIGH',
-
             'border-yellow-500 bg-yellow-50': issue.priority === 'MEDIUM',
-
             'border-green-500 bg-green-50': issue.priority === 'LOW',
-
             highlighted:
               highlightedIssue === 'sop' && highlightedIndex === index,
           }"
         >
           <!-- Title & Icon -->
-
           <div class="flex items-center mb-2">
             <span class="text-lg mr-2">
               <span v-if="issue.priority === 'HIGH'">
                 <i class="fa-solid fa-radiation text-red-800"></i>
               </span>
-
               <span v-if="issue.priority === 'MEDIUM'">
                 <i class="fa-solid fa-triangle-exclamation text-yellow-500"></i>
               </span>
-
               <span v-if="issue.priority === 'LOW'">
                 <i class="fa-solid fa-triangle-exclamation text-green-500"></i>
               </span>
             </span>
-
             <h4 class="text-md font-semibold">{{ issue.message }}</h4>
           </div>
-
           <p class="text-gray-700 text-sm">
             <strong>Why this matters:</strong>
-
             {{ getExplanation(issue) || "No explanation provided." }}
           </p>
-
           <a
             :href="issue.link"
             target="_blank"

@@ -47,6 +47,7 @@
 
 <script>
 import axios from "axios";
+import baseUrl from "../config";
 
 export default {
   props: ["modelValue"], // Bind to parent component
@@ -86,7 +87,7 @@ export default {
         formattedUrl = "http://" + formattedUrl; // ✅ Ensure protocol exists
       }
 
-      const token = sessionStorage.getItem("token");
+      const token = localStorage.getItem("token");
       console.log(token);
 
       if (!token) {
@@ -97,7 +98,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "https://bdt.proweaver.tools/web-diagnostic-api/public/api/analyze-website",
+          `${baseUrl}/api/analyze-website`,
           { url: formattedUrl },
           {
             headers: {
