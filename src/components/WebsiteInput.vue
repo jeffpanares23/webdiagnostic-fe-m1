@@ -73,22 +73,20 @@ export default {
     async submitUrl() {
       this.errorMessage = "";
       this.loading = true;
-      this.$emit("loading"); // Trigger loading state in parent component
+      this.$emit("loading");
 
-      // Ensure websiteUrl is defined and not empty
       if (!this.websiteUrl || this.websiteUrl.trim() === "") {
         this.errorMessage = "Please enter a valid URL.";
-        this.loading = false; // Stop loading state if input is empty
+        this.loading = false;
         return;
       }
 
       let formattedUrl = this.websiteUrl.trim();
       if (!/^https?:\/\//i.test(formattedUrl)) {
-        formattedUrl = "http://" + formattedUrl; // ✅ Ensure protocol exists
+        formattedUrl = "http://" + formattedUrl;
       }
 
       const token = localStorage.getItem("token");
-      console.log(token);
 
       if (!token) {
         this.errorMessage = "You are not authenticated. Please log in.";
@@ -115,22 +113,27 @@ export default {
 
         console.log(response.data);
 
-        const processedData = {
-          url: formattedUrl,
-          metadata: response.data.metadata || {},
-          sop: response.data.sop || {},
-          seo_checks: response.data.seo_checks || {},
-          issues: response.data.issues || [],
-        };
+        const pagesData = response.data.pages.map((page) => ({
+          url: page.url,
+          title: page.title || "N/A",
+          title_length: page.title_length || "N/A",
+          description: page.description || "N/A",
+          description_length: page.description_length || "N/A",
+          hasHttps: page.hasHttps ? "Yes" : "No",
+          address: page.address || "N/A",
+          phone: page.phone_number || "N/A",
+          email: page.email_address || "N/A",
+        }));
 
-        this.$emit("results", processedData);
+        // Emit all pages data
+        this.$emit("results", { pages: pagesData });
       } catch (error) {
         this.errorMessage =
           error.response?.data?.error ||
           "An error occurred while processing the URL.";
         console.error("API Error:", error);
       } finally {
-        this.loading = false; // ✅ Stop loading state after API call
+        this.loading = false;
       }
     },
   },
