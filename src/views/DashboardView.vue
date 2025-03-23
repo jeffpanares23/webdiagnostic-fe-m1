@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col lg:flex-row p-6 max-w-7xl m-auto">
+  <div class="flex flex-col lg:flex-row p-6 m-auto">
     <!-- 📌 Sidebar Toggle Button for Mobile -->
     <button
       class="lg:hidden bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
@@ -16,7 +16,7 @@
     ></div>
 
     <!-- 📌 Sidebar Drawer -->
-    <div
+    <!-- <div
       class="lg:w-1/4 w-full shadow-md lg:relative fixed inset-y-0 left-0 z-20 h-full overflow-y-auto bg-white transform transition-transform lg:translate-x-0"
       :class="{
         '-translate-x-full': !sidebarOpen,
@@ -34,7 +34,7 @@
         @select="handleHistorySelect"
         @updateUrl="websiteUrl = $event"
       />
-    </div>
+    </div> -->
 
     <!-- 📌 Main Content -->
     <div class="lg:w-3/4 w-full flex-1 p-4 pt-0 container mx-auto space-y-6">
@@ -107,7 +107,7 @@ export default {
     WebsiteInput,
     ValidationResults,
     ExportButtons,
-    HistorySidebar,
+    // HistorySidebar,
   },
   data() {
     return {
