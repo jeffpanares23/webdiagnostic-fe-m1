@@ -254,10 +254,6 @@
             </div>
 
             <!-- Optional: still keep the issues panel below -->
-            <PageIssuesPanel
-              :issues="currentPage.issues || []"
-              section="metadata"
-            />
           </div>
 
           <div v-else-if="activeTab === 'SOP Compliance'">
@@ -342,7 +338,7 @@
         <h3 class="text-md font-semibold mb-2">🚨 Issues to Fix</h3>
         <div v-if="hasIssues" class="space-y-3">
           <div
-            v-for="(issue, index) in results.issues"
+            v-for="(issue, index) in filteredIssuesToFix"
             :key="index"
             class="flex items-center p-3 border-l-4 rounded-md shadow-sm transition-all duration-200 hover:shadow-lg cursor-pointer"
             :class="{
@@ -380,7 +376,7 @@
         :class="{ 'highlight-section': highlight === 'metadata' }"
       >
         <h3 class="text-md font-semibold mb-2">📄 Metadata Issues</h3>
-        <div v-if="metadataIssues.length > 0" class="space-y-3">
+        <!-- <div v-if="metadataIssues.length > 0" class="space-y-3">
           <div
             v-for="(issue, index) in metadataIssues"
             :key="index"
@@ -420,7 +416,11 @@
               Learn More
             </a>
           </div>
-        </div>
+        </div> -->
+        <PageIssuesPanel
+          :issues="currentPage.issues || []"
+          section="metadata"
+        />
       </div>
 
       <!-- SOP Compliance Issues -->
@@ -547,6 +547,24 @@ export default {
         );
       });
     },
+    filteredIssuesToFix() {
+      if (!this.currentPage || !this.currentPage.issues) return [];
+
+      return this.currentPage.issues.filter((issue) => {
+        if (this.activeTab === "Meta Data") {
+          return (
+            issue.section === "metadata" &&
+            !issue.message.toLowerCase().includes("https")
+          );
+        } else if (this.activeTab === "SOP Compliance") {
+          return (
+            issue.section === "sop" ||
+            issue.message.toLowerCase().includes("https")
+          );
+        }
+        return false;
+      });
+    },
     // currentPage() {
     //   return this.selectedPage !== null
     //     ? this.filteredResults[this.selectedPage]
@@ -583,15 +601,28 @@ export default {
       };
     },
     hasIssues() {
-      return this.results.issues && this.results.issues.length > 0;
+      // return this.currentPage.issues && this.currentPage.issues.length > 0;
+      return this.filteredIssuesToFix.length > 0;
     },
-    metadataIssues() {
-      console.log(this.results.issues);
+    allIssues() {
+      if (!this.results.pages) return [];
+      return this.results.pages.flatMap((page) => page.issues || []);
+    },
+    // metadataIssues() {
+    //   console.log(this.results.issues);
 
-      return this.results.issues?.filter((i) => i.section === "metadata") || [];
+    //   return this.results.issues?.filter((i) => i.section === "metadata") || [];
+    // },
+    // sopIssues() {
+    //   return this.results.issues?.filter((i) => i.section === "sop") || [];
+    // },
+    metadataIssues() {
+      if (!this.currentPage || !this.currentPage.issues) return [];
+      return this.currentPage.issues.filter((i) => i.section === "metadata");
     },
     sopIssues() {
-      return this.results.issues?.filter((i) => i.section === "sop") || [];
+      if (!this.currentPage || !this.currentPage.issues) return [];
+      return this.currentPage.issues.filter((i) => i.section === "sop");
     },
   },
   methods: {
@@ -599,6 +630,9 @@ export default {
     //   this.selectedPage = index;
     //   localStorage.setItem("selectedPageIndex", index);
     // },
+    getExplanation(issue) {
+      return issue.explanation || "";
+    },
     selectPage(index) {
       const page = this.filteredResults[index];
       if (!page) {

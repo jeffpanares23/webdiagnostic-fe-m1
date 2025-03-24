@@ -62,8 +62,16 @@ export default {
   },
   computed: {
     filteredIssues() {
-      console.log(this.issues);
-      return this.issues.filter((i) => i.section === this.section);
+      return this.issues.filter((i) => {
+        // Avoid showing HTTPS issues in metadata section
+        if (
+          this.section === "metadata" &&
+          i.message?.toLowerCase().includes("https")
+        ) {
+          return false;
+        }
+        return i.section === this.section;
+      });
     },
   },
 };
