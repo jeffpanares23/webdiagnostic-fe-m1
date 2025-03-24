@@ -14,7 +14,7 @@
         <h4 class="font-semibold text-sm">
           <span class="mr-2">📌</span> {{ issue.message }}
         </h4>
-        <span
+        <!-- <span
           class="text-xs font-bold px-2 py-1 rounded-full"
           :class="{
             'bg-red-500 text-white': issue.priority === 'HIGH',
@@ -23,7 +23,7 @@
           }"
         >
           {{ issue.priority }}
-        </span>
+        </span> -->
       </div>
       <div class="text-xs mb-1">
         <strong>Why this matters:</strong>
@@ -38,10 +38,7 @@
         Learn More
       </a>
     </div>
-    <div
-      v-if="filteredIssues.length === 0"
-      class="text-sm text-gray-500 italic"
-    >
+    <div v-if="filteredIssues.length === 0" class="text-sm text-gray-500">
       ✅ No issues found in this section.
     </div>
   </div>

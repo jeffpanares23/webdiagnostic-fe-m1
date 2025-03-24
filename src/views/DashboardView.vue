@@ -71,7 +71,7 @@
       </div>
 
       <!-- 📌 Empty State Message with Tips -->
-      <div v-if="!results" class="text-center mt-10">
+      <div v-if="!results && !loading" class="text-center mt-10">
         <img
           src="@/assets/Web-search.gif"
           class="w-2/3 md:w-1/3 opacity-75 m-auto"
@@ -83,9 +83,21 @@
       </div>
 
       <!-- 📌 Loading Indicator -->
-      <transition name="fade">
+      <!-- <transition name="fade">
         <div v-if="loading" class="text-center text-gray-500">
           Scanning website...
+        </div>
+      </transition> -->
+      <transition name="slide-expand">
+        <div
+          v-if="loading"
+          class="w-full bg-blue-50 p-8 flex flex-col justify-center items-center text-center shadow-lg transition-all duration-500"
+        >
+          <h3 class="text-lg font-semibold mb-4">Analyzing Website Data...</h3>
+          <p class="text-gray-600">{{ loadingInsight }}</p>
+          <div class="progress-bar mt-4">
+            <div class="progress" :style="{ width: progress + '%' }"></div>
+          </div>
         </div>
       </transition>
     </div>
@@ -113,6 +125,15 @@ export default {
     return {
       websiteUrl: "",
       loading: false,
+      progress: 0,
+      loadingInsight: "Initializing...",
+      insights: [
+        "Checking server response time...",
+        "Verifying SSL security...",
+        "Analyzing website load performance...",
+        "Scanning SEO metrics...",
+        "Optimizing user experience...",
+      ],
       results: null,
       tabs: ["Results"],
       activeTab: "Results",
@@ -177,6 +198,22 @@ export default {
     },
     setLoading() {
       this.loading = true;
+      this.startLoadingAnimation();
+    },
+    startLoadingAnimation() {
+      let index = 0;
+      this.progress = 0;
+
+      const interval = setInterval(() => {
+        if (this.progress >= 100) {
+          clearInterval(interval);
+        } else {
+          this.progress += 5;
+          // Rotate through your insights array
+          this.loadingInsight = this.insights[index % this.insights.length];
+          index++;
+        }
+      }, 3000);
     },
   },
 };
@@ -190,6 +227,30 @@ export default {
   background: rgba(0, 0, 0, 0.5);
   z-index: 15;
   transition: opacity 0.3s ease-in-out;
+}
+
+.progress-bar {
+  width: 80%;
+  height: 10px;
+  background: #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.progress {
+  height: 100%;
+  background: #3498db;
+  transition: width 3s ease;
+}
+
+/* Optional for the slide-expand transition */
+.slide-expand-enter-active,
+.slide-expand-leave-active {
+  transition: all 3s ease;
+}
+.slide-expand-enter-from,
+.slide-expand-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 /* 📌 Sidebar Drawer Transition for Mobile */

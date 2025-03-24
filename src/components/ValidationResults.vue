@@ -102,7 +102,7 @@
             <span class="text-blue-600">{{ currentPage.url }}</span>
           </h3>
         </div>
-        <div class="flex space-x-4 border-b pb-2 text-sm">
+        <div class="flex text-sm">
           <button
             v-for="tab in tabs"
             :key="tab"
@@ -111,7 +111,7 @@
               'px-3 py-1 rounded-t-md',
               activeTab === tab
                 ? 'bg-white border-t border-l border-r'
-                : 'bg-gray-200 hover:bg-gray-300',
+                : 'hover:bg-gray-300',
             ]"
           >
             {{ tab }}
@@ -119,32 +119,7 @@
         </div>
 
         <!-- Tab Content -->
-        <div class="p-3 text-sm">
-          <!-- <div v-if="activeTab === 'Meta Data'">
-            <p><strong>Title:</strong> {{ currentPage.title }}</p>
-            <p><strong>Title Length:</strong> {{ currentPage.title_length }}</p>
-            <p>
-              <strong>Meta Description:</strong>
-              {{ currentPage.description || "Missing" }}
-            </p>
-            <p><strong>HTTPS:</strong> {{ currentPage.hasHttps }}</p>
-            <p>
-              <strong>Duplicate Title:</strong>
-              {{ currentPage.is_title_duplicate ? "Yes" : "No" }}
-            </p>
-            <PageIssuesPanel
-              v-if="
-                currentPage && currentPage.issues && currentPage.issues.length
-              "
-              :issues="currentPage.issues"
-              section="metadata"
-            />
-          </div>
-          <div v-else-if="activeTab === 'Headers'">
-            <p v-for="header in currentPage.headers" :key="header">
-              - {{ header }}
-            </p>
-          </div> -->
+        <div class="text-sm">
           <div v-if="activeTab === 'Meta Data'">
             <div class="metadata bg-gray-50 p-4 rounded-md border">
               <h3 class="text-md font-semibold mb-2">Metadata Validation</h3>
@@ -257,71 +232,119 @@
           </div>
 
           <div v-else-if="activeTab === 'SOP Compliance'">
-            <p>
-              <strong>Phone Number:</strong> {{ currentPage?.phone || "—" }}
-            </p>
-            <p>
-              <strong>Phone Format:</strong>
-              {{
-                currentPage.sop?.phone_format_valid === true
-                  ? "✅ Valid"
-                  : currentPage.sop?.phone_format_valid === false
-                  ? "❌ Invalid"
-                  : "—"
-              }}
-            </p>
-            <p>
-              <strong>Email Address:</strong> {{ currentPage?.email || "—" }}
-            </p>
-            <p>
-              <strong>Email Format:</strong>
-              {{
-                currentPage.sop?.email_format_valid === true
-                  ? "✅ Valid"
-                  : currentPage.sop?.email_format_valid === false
-                  ? "❌ Invalid"
-                  : "—"
-              }}
-            </p>
-            <p><strong>Address:</strong> {{ currentPage?.address || "—" }}</p>
-            <p>
-              <strong>Address Format:</strong>
-              {{
-                currentPage.sop?.address_format_valid === true
-                  ? "✅ Valid"
-                  : currentPage.sop?.address_format_valid === false
-                  ? "❌ Invalid"
-                  : "—"
-              }}
-            </p>
-            <p>
-              <strong>Company Name:</strong>
-              {{ currentPage?.company_name || "—" }}
-            </p>
-            <!-- <p>
-              <strong>Company Name Match:</strong>
-              {{
-                currentPage.sop?.company_name_valid === true
-                  ? "✅ Match"
-                  : currentPage.sop?.company_name_valid === false
-                  ? "❌ Mismatch"
-                  : "—"
-              }}
-            </p> -->
-            <p>
-              <strong>Copyright:</strong> {{ currentPage?.copyright || "—" }}
-            </p>
-            <p>
-              <strong>Copyright Year:</strong>
-              {{
-                currentPage.sop?.copyright_year_valid === true
-                  ? "✅ Current"
-                  : currentPage.sop?.copyright_year_valid === false
-                  ? "❌ Outdated"
-                  : "—"
-              }}
-            </p>
-            <PageIssuesPanel :issues="currentPage.issues || []" section="sop" />
+            <!-- 1. Quick Summary: SOP Compliance Overview -->
+            <div class="p-4 mb-4 bg-gray-50 border rounded-md">
+              <h3 class="font-semibold text-sm text-gray-700 mb-2">
+                SOP Compliance Overview
+              </h3>
+              <p class="text-xs text-gray-500">
+                Below is a quick summary of your compliance status. Items in
+                <span class="text-red-500">red</span> need attention.
+              </p>
+
+              <!-- Progress Bar -->
+              <div class="mt-2 bg-gray-200 h-2 w-full rounded-full">
+                <div
+                  class="bg-green-500 h-2 rounded-full"
+                  :style="{ width: sopCompliancePercentage + '%' }"
+                ></div>
+              </div>
+              <p class="mt-1 text-xs text-gray-700">
+                {{ sopCompliancePassed }}/{{ sopComplianceTotal }} checks passed
+                ({{ sopCompliancePercentage }}%)
+              </p>
+            </div>
+
+            <!-- 2. Grouped Sections -->
+            <div class="space-y-4">
+              <!-- Contact Info -->
+              <div class="p-4 bg-white border rounded-md shadow-sm">
+                <h4 class="text-md font-semibold mb-3">Contact Info</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <!-- Phone Number -->
+                  <div>
+                    <strong>Phone Number: &nbsp;</strong>
+                    <span
+                      :class="{
+                        'text-green-600': currentPage.sop?.phone_format_valid,
+                        'text-red-500':
+                          currentPage.sop?.phone_format_valid === false,
+                      }"
+                    >
+                      {{ currentPage.phone || "—" }}
+                    </span>
+                  </div>
+
+                  <!-- Email Address -->
+                  <div>
+                    <strong>Email Address: &nbsp;</strong>
+                    <span
+                      :class="{
+                        'text-green-600': currentPage.sop?.email_format_valid,
+                        'text-red-500':
+                          currentPage.sop?.email_format_valid === false,
+                      }"
+                    >
+                      {{ currentPage.email || "—" }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Company Info -->
+              <div class="p-4 bg-white border rounded-md shadow-sm">
+                <h4 class="text-md font-semibold mb-3">Company Info</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <!-- Company Name -->
+                  <div>
+                    <strong>Company Name: &nbsp;</strong>
+                    <span
+                      :class="{
+                        'text-green-600': currentPage.sop?.company_name_valid,
+                        'text-red-500':
+                          currentPage.sop?.company_name_valid === false,
+                      }"
+                    >
+                      {{ currentPage.company_name || "—" }}
+                    </span>
+                  </div>
+
+                  <!-- Address -->
+                  <div>
+                    <strong>Address: &nbsp;</strong>
+                    <span
+                      :class="{
+                        'text-green-600': currentPage.sop?.address_format_valid,
+                        'text-red-500':
+                          currentPage.sop?.address_format_valid === false,
+                      }"
+                    >
+                      {{ currentPage.address || "—" }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Legal -->
+              <div class="p-4 bg-white border rounded-md shadow-sm">
+                <h4 class="text-md font-semibold mb-3">Legal</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <!-- Removed Privacy Policy -->
+                  <div>
+                    <strong>Copyright: &nbsp;</strong>
+                    <span
+                      :class="{
+                        'text-green-600': currentPage.sop?.copyright_year_valid,
+                        'text-red-500':
+                          currentPage.sop?.copyright_year_valid === false,
+                      }"
+                    >
+                      {{ currentPage.copyright || "—" }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -371,52 +394,12 @@
 
       <!-- Metadata Issues -->
       <div
+        v-if="activeTab === 'Meta Data'"
         ref="metadataIssues"
         class="metadata-issues bg-white p-4 rounded-md border mt-4"
         :class="{ 'highlight-section': highlight === 'metadata' }"
       >
         <h3 class="text-md font-semibold mb-2">📄 Metadata Issues</h3>
-        <!-- <div v-if="metadataIssues.length > 0" class="space-y-3">
-          <div
-            v-for="(issue, index) in metadataIssues"
-            :key="index"
-            class="p-4 border rounded-md shadow-sm transition-all duration-300"
-            :class="{
-              'border-red-500 bg-red-50': issue.priority === 'HIGH',
-              'border-yellow-500 bg-yellow-50': issue.priority === 'MEDIUM',
-              'border-green-500 bg-green-50': issue.priority === 'LOW',
-            }"
-          >
-            <div class="flex items-center mb-2">
-              <span class="text-lg mr-2">
-                <i
-                  v-if="issue.priority === 'HIGH'"
-                  class="fa-solid fa-radiation text-red-800"
-                ></i>
-                <i
-                  v-if="issue.priority === 'MEDIUM'"
-                  class="fa-solid fa-triangle-exclamation text-yellow-500"
-                ></i>
-                <i
-                  v-if="issue.priority === 'LOW'"
-                  class="fa-solid fa-triangle-exclamation text-green-500"
-                ></i>
-              </span>
-              <h4 class="text-md font-semibold">{{ issue.message }}</h4>
-            </div>
-            <p class="text-gray-700 text-sm">
-              <strong>Why this matters:</strong>
-              {{ getExplanation(issue) || "No explanation provided." }}
-            </p>
-            <a
-              :href="issue.link"
-              target="_blank"
-              class="text-blue-500 underline mt-2 inline-block"
-            >
-              Learn More
-            </a>
-          </div>
-        </div> -->
         <PageIssuesPanel
           :issues="currentPage.issues || []"
           section="metadata"
@@ -425,12 +408,13 @@
 
       <!-- SOP Compliance Issues -->
       <div
+        v-if="activeTab === 'SOP Compliance'"
         ref="sopIssues"
         class="sop-issues bg-white p-4 rounded-md border mt-4"
         :class="{ 'highlight-section': highlight === 'sop' }"
       >
-        <h3 class="text-md font-semibold mb-2">🏢 SOP Compliance Issues</h3>
-        <div v-if="sopIssues.length > 0" class="space-y-3">
+        <h3 class="text-sm font-semibold mb-2">🏢 SOP Compliance Issues</h3>
+        <!-- <div v-if="sopIssues.length > 0" class="space-y-3">
           <div
             v-for="(issue, index) in sopIssues"
             :key="index"
@@ -473,7 +457,9 @@
               Learn More
             </a>
           </div>
-        </div>
+        </div> -->
+        <PageIssuesPanel :issues="currentPage.issues || []" section="sop" />
+        <!-- <PageIssuesPanel :issues="currentPage.issues || []" section="sop" /> -->
       </div>
     </div>
   </div>
@@ -508,9 +494,37 @@ export default {
       highlight: null,
       highlightedIssue: null,
       highlightedIndex: null,
+      passedChecks: 0,
+      totalChecks: 0,
     };
   },
   computed: {
+    compliancePercentage() {
+      if (this.totalChecks === 0) return 0;
+      return Math.round((this.passedChecks / this.totalChecks) * 100);
+    },
+    // How many SOP fields are valid
+    sopCompliancePassed() {
+      if (!this.currentPage.sop) return 0;
+      let count = 0;
+      if (this.currentPage.sop.phone_format_valid) count++;
+      if (this.currentPage.sop.email_format_valid) count++;
+      if (this.currentPage.sop.address_format_valid) count++;
+      if (this.currentPage.sop.company_name_valid) count++;
+      if (this.currentPage.sop.copyright_year_valid) count++;
+      return count;
+    },
+    // Total SOP checks (5 in this example)
+    sopComplianceTotal() {
+      return 5;
+    },
+    // Calculate SOP compliance percentage
+    sopCompliancePercentage() {
+      if (this.sopComplianceTotal === 0) return 0;
+      return Math.round(
+        (this.sopCompliancePassed / this.sopComplianceTotal) * 100
+      );
+    },
     filteredResults() {
       return this.results.pages.filter((page) => {
         const matchTitle =
