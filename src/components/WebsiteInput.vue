@@ -113,6 +113,18 @@ export default {
 
         console.log(response.data);
 
+        // const pagesData = response.data.pages.map((page) => ({
+        //   url: page.url,
+        //   title: page.title || "N/A",
+        //   title_length: page.title_length || "N/A",
+        //   description: page.description || "N/A",
+        //   description_length: page.description_length || "N/A",
+        //   hasHttps: page.hasHttps ? "Yes" : "No",
+        //   address: page.address || "N/A",
+        //   phone: page.phone_number || "N/A",
+        //   email: page.email_address || "N/A",
+        // }));
+
         const pagesData = response.data.pages.map((page) => ({
           url: page.url,
           title: page.title || "N/A",
@@ -123,6 +135,10 @@ export default {
           address: page.address || "N/A",
           phone: page.phone_number || "N/A",
           email: page.email_address || "N/A",
+          company_name: page.company_name || "N/A",
+          copyright: page.copyright || "N/A",
+          sop: page.sop || {},
+          issues: page.issues || [],
         }));
 
         // Emit all pages data

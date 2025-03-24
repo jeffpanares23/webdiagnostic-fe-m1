@@ -62,6 +62,7 @@ export default {
   },
   computed: {
     filteredIssues() {
+      console.log(this.issues);
       return this.issues.filter((i) => i.section === this.section);
     },
   },

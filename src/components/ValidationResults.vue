@@ -120,7 +120,7 @@
 
         <!-- Tab Content -->
         <div class="p-3 text-sm">
-          <div v-if="activeTab === 'SEO Info'">
+          <!-- <div v-if="activeTab === 'Meta Data'">
             <p><strong>Title:</strong> {{ currentPage.title }}</p>
             <p><strong>Title Length:</strong> {{ currentPage.title_length }}</p>
             <p>
@@ -144,47 +144,188 @@
             <p v-for="header in currentPage.headers" :key="header">
               - {{ header }}
             </p>
+          </div> -->
+          <div v-if="activeTab === 'Meta Data'">
+            <div class="metadata bg-gray-50 p-4 rounded-md border">
+              <h3 class="text-md font-semibold mb-2">Metadata Validation</h3>
+
+              <!-- Meta Title Validation -->
+              <div class="p-3 border-b bg-white shadow-md rounded-md mb-2">
+                <p class="font-bold">Meta Title Test</p>
+                <p>
+                  <strong>Text: </strong>
+                  <span v-if="currentPage.title">{{ currentPage.title }}</span>
+                  <span v-else class="text-gray-400">No Meta Title Found</span>
+                </p>
+                <p>
+                  <strong>Length: </strong>
+                  <span v-if="currentPage.title_length">
+                    {{ currentPage.title_length }} characters
+                  </span>
+                  <span v-else class="text-gray-400">No Data</span>
+                </p>
+                <p v-if="!currentPage.title" class="text-red-500 font-bold">
+                  ⚠️ No Meta Title detected. Ensure your page has a proper title
+                  for better SEO.
+                </p>
+                <p
+                  v-if="currentPage.is_title_duplicate"
+                  class="text-red-500 font-bold"
+                >
+                  ⚠️ Duplicate Page Title Found
+                </p>
+                <p
+                  v-if="
+                    currentPage.title_length < 50 &&
+                    currentPage.title_length > 0
+                  "
+                  class="text-yellow-500 font-bold"
+                >
+                  ⚠️ Title is Too Short
+                </p>
+                <p
+                  v-if="currentPage.title_length > 60"
+                  class="text-yellow-500 font-bold"
+                >
+                  ⚠️ Title is Too Long
+                </p>
+                <p
+                  v-if="
+                    currentPage.title_length >= 50 &&
+                    currentPage.title_length <= 60
+                  "
+                  class="text-green-500 font-bold"
+                >
+                  ✅ Title is in the Ideal Range
+                </p>
+              </div>
+
+              <!-- Meta Description Validation -->
+              <div class="p-3 border-b bg-white shadow-md rounded-md">
+                <p class="font-bold">Meta Description Test</p>
+                <p>
+                  <strong>Text: </strong>
+                  <span v-if="currentPage.description">
+                    {{ currentPage.description }}
+                  </span>
+                  <span v-else class="text-gray-400"
+                    >No Meta Description Found</span
+                  >
+                </p>
+                <p>
+                  <strong>Length: </strong>
+                  <span v-if="currentPage.description_length">
+                    {{ currentPage.description_length }} characters
+                  </span>
+                  <span v-else class="text-gray-400">No Data</span>
+                </p>
+                <p
+                  v-if="!currentPage.description"
+                  class="text-red-500 font-bold"
+                >
+                  ⚠️ No Meta Description detected. Add a brief summary of your
+                  page for better SEO.
+                </p>
+                <p
+                  v-if="
+                    currentPage.description_length < 150 &&
+                    currentPage.description_length > 0
+                  "
+                  class="text-yellow-500 font-bold"
+                >
+                  ⚠️ Meta Description is Too Short
+                </p>
+                <p
+                  v-if="currentPage.description_length > 220"
+                  class="text-yellow-500 font-bold"
+                >
+                  ⚠️ Meta Description is Too Long
+                </p>
+                <p
+                  v-if="
+                    currentPage.description_length >= 150 &&
+                    currentPage.description_length <= 220
+                  "
+                  class="text-green-500 font-bold"
+                >
+                  ✅ Meta Description is in the Ideal Range
+                </p>
+              </div>
+            </div>
+
+            <!-- Optional: still keep the issues panel below -->
+            <PageIssuesPanel
+              :issues="currentPage.issues || []"
+              section="metadata"
+            />
           </div>
+
           <div v-else-if="activeTab === 'SOP Compliance'">
+            <p>
+              <strong>Phone Number:</strong> {{ currentPage?.phone || "—" }}
+            </p>
             <p>
               <strong>Phone Format:</strong>
               {{
-                currentPage.sop.phone_format_valid ? "✅ Valid" : "❌ Invalid"
+                currentPage.sop?.phone_format_valid === true
+                  ? "✅ Valid"
+                  : currentPage.sop?.phone_format_valid === false
+                  ? "❌ Invalid"
+                  : "—"
               }}
+            </p>
+            <p>
+              <strong>Email Address:</strong> {{ currentPage?.email || "—" }}
             </p>
             <p>
               <strong>Email Format:</strong>
               {{
-                currentPage.sop.email_format_valid ? "✅ Valid" : "❌ Invalid"
+                currentPage.sop?.email_format_valid === true
+                  ? "✅ Valid"
+                  : currentPage.sop?.email_format_valid === false
+                  ? "❌ Invalid"
+                  : "—"
               }}
             </p>
+            <p><strong>Address:</strong> {{ currentPage?.address || "—" }}</p>
             <p>
               <strong>Address Format:</strong>
               {{
-                currentPage.sop.address_format_valid ? "✅ Valid" : "❌ Invalid"
+                currentPage.sop?.address_format_valid === true
+                  ? "✅ Valid"
+                  : currentPage.sop?.address_format_valid === false
+                  ? "❌ Invalid"
+                  : "—"
               }}
             </p>
             <p>
               <strong>Company Name:</strong>
+              {{ currentPage?.company_name || "—" }}
+            </p>
+            <!-- <p>
+              <strong>Company Name Match:</strong>
               {{
-                currentPage.sop.company_name_valid ? "✅ Match" : "❌ Mismatch"
+                currentPage.sop?.company_name_valid === true
+                  ? "✅ Match"
+                  : currentPage.sop?.company_name_valid === false
+                  ? "❌ Mismatch"
+                  : "—"
               }}
+            </p> -->
+            <p>
+              <strong>Copyright:</strong> {{ currentPage?.copyright || "—" }}
             </p>
             <p>
               <strong>Copyright Year:</strong>
               {{
-                currentPage.sop.copyright_year_valid
+                currentPage.sop?.copyright_year_valid === true
                   ? "✅ Current"
-                  : "❌ Outdated"
+                  : currentPage.sop?.copyright_year_valid === false
+                  ? "❌ Outdated"
+                  : "—"
               }}
             </p>
-            <PageIssuesPanel
-              v-if="
-                currentPage && currentPage.issues && currentPage.issues.length
-              "
-              :issues="currentPage.issues"
-              section="sop"
-            />
+            <PageIssuesPanel :issues="currentPage.issues || []" section="sop" />
           </div>
         </div>
       </div>
@@ -194,6 +335,146 @@
     <div class="col-span-3 bg-white border rounded p-3 text-sm">
       <h3 class="font-semibold mb-2">Validation Summary</h3>
       <PieChart :chart-data="chartData" />
+    </div>
+    <!-- Issues to Fix Section -->
+    <div class="col-span-12 mt-4">
+      <div class="issues-to-fix bg-white p-4 rounded-md border">
+        <h3 class="text-md font-semibold mb-2">🚨 Issues to Fix</h3>
+        <div v-if="hasIssues" class="space-y-3">
+          <div
+            v-for="(issue, index) in results.issues"
+            :key="index"
+            class="flex items-center p-3 border-l-4 rounded-md shadow-sm transition-all duration-200 hover:shadow-lg cursor-pointer"
+            :class="{
+              'bg-red-50 border-red-500': issue.priority === 'HIGH',
+              'bg-yellow-50 border-yellow-500': issue.priority === 'MEDIUM',
+              'bg-green-50 border-green-500': issue.priority === 'LOW',
+            }"
+            @click="scrollToSection(issue.section)"
+          >
+            <span
+              class="text-xs font-bold px-3 py-1 min-w-20 text-center rounded"
+              :class="{
+                'bg-red-500 text-white': issue.priority === 'HIGH',
+                'bg-yellow-500 text-white': issue.priority === 'MEDIUM',
+                'bg-green-500 text-white': issue.priority === 'LOW',
+              }"
+            >
+              {{ issue.priority }}
+            </span>
+
+            <p class="ml-4 text-gray-700 flex items-center">
+              <a class="hover:text-blue-700">
+                {{ issue.message }}
+              </a>
+            </p>
+          </div>
+        </div>
+        <p v-else class="text-gray-500">✅ No critical issues found.</p>
+      </div>
+
+      <!-- Metadata Issues -->
+      <div
+        ref="metadataIssues"
+        class="metadata-issues bg-white p-4 rounded-md border mt-4"
+        :class="{ 'highlight-section': highlight === 'metadata' }"
+      >
+        <h3 class="text-md font-semibold mb-2">📄 Metadata Issues</h3>
+        <div v-if="metadataIssues.length > 0" class="space-y-3">
+          <div
+            v-for="(issue, index) in metadataIssues"
+            :key="index"
+            class="p-4 border rounded-md shadow-sm transition-all duration-300"
+            :class="{
+              'border-red-500 bg-red-50': issue.priority === 'HIGH',
+              'border-yellow-500 bg-yellow-50': issue.priority === 'MEDIUM',
+              'border-green-500 bg-green-50': issue.priority === 'LOW',
+            }"
+          >
+            <div class="flex items-center mb-2">
+              <span class="text-lg mr-2">
+                <i
+                  v-if="issue.priority === 'HIGH'"
+                  class="fa-solid fa-radiation text-red-800"
+                ></i>
+                <i
+                  v-if="issue.priority === 'MEDIUM'"
+                  class="fa-solid fa-triangle-exclamation text-yellow-500"
+                ></i>
+                <i
+                  v-if="issue.priority === 'LOW'"
+                  class="fa-solid fa-triangle-exclamation text-green-500"
+                ></i>
+              </span>
+              <h4 class="text-md font-semibold">{{ issue.message }}</h4>
+            </div>
+            <p class="text-gray-700 text-sm">
+              <strong>Why this matters:</strong>
+              {{ getExplanation(issue) || "No explanation provided." }}
+            </p>
+            <a
+              :href="issue.link"
+              target="_blank"
+              class="text-blue-500 underline mt-2 inline-block"
+            >
+              Learn More
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOP Compliance Issues -->
+      <div
+        ref="sopIssues"
+        class="sop-issues bg-white p-4 rounded-md border mt-4"
+        :class="{ 'highlight-section': highlight === 'sop' }"
+      >
+        <h3 class="text-md font-semibold mb-2">🏢 SOP Compliance Issues</h3>
+        <div v-if="sopIssues.length > 0" class="space-y-3">
+          <div
+            v-for="(issue, index) in sopIssues"
+            :key="index"
+            ref="sopIssueRefs"
+            class="p-4 border rounded-md shadow-sm transition-all duration-300"
+            :class="{
+              'border-red-500 bg-red-50': issue.priority === 'HIGH',
+              'border-yellow-500 bg-yellow-50': issue.priority === 'MEDIUM',
+              'border-green-500 bg-green-50': issue.priority === 'LOW',
+              highlighted:
+                highlightedIssue === 'sop' && highlightedIndex === index,
+            }"
+          >
+            <div class="flex items-center mb-2">
+              <span class="text-lg mr-2">
+                <i
+                  v-if="issue.priority === 'HIGH'"
+                  class="fa-solid fa-radiation text-red-800"
+                ></i>
+                <i
+                  v-if="issue.priority === 'MEDIUM'"
+                  class="fa-solid fa-triangle-exclamation text-yellow-500"
+                ></i>
+                <i
+                  v-if="issue.priority === 'LOW'"
+                  class="fa-solid fa-triangle-exclamation text-green-500"
+                ></i>
+              </span>
+              <h4 class="text-md font-semibold">{{ issue.message }}</h4>
+            </div>
+            <p class="text-gray-700 text-sm">
+              <strong>Why this matters:</strong>
+              {{ getExplanation(issue) || "No explanation provided." }}
+            </p>
+            <a
+              :href="issue.link"
+              target="_blank"
+              class="text-blue-500 underline mt-2 inline-block"
+            >
+              Learn More
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -205,7 +486,7 @@ import PageIssuesPanel from "@/components/validation/PageIssuesPanel.vue";
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 export default {
   name: "ValidationResults",
-  components: { PieChart },
+  components: { PieChart, PageIssuesPanel },
   props: {
     results: {
       type: Object,
@@ -215,8 +496,8 @@ export default {
   data() {
     return {
       selectedPage: null,
-      activeTab: "SEO Info",
-      tabs: ["SEO Info", "Headers", "SOP Compliance"],
+      activeTab: "Meta Data",
+      tabs: ["Meta Data", "SOP Compliance"],
       filters: {
         titleStatus: "",
         metaStatus: "",
@@ -224,6 +505,9 @@ export default {
         duplicateTitle: "",
       },
       searchQuery: "",
+      highlight: null,
+      highlightedIssue: null,
+      highlightedIndex: null,
     };
   },
   computed: {
@@ -263,11 +547,17 @@ export default {
         );
       });
     },
+    // currentPage() {
+    //   return this.selectedPage !== null
+    //     ? this.filteredResults[this.selectedPage]
+    //     : {};
+    // },
     currentPage() {
       return this.selectedPage !== null
-        ? this.filteredResults[this.selectedPage]
+        ? this.results.pages[this.selectedPage]
         : {};
     },
+
     chartData() {
       const errors = this.results.pages.filter(
         (p) =>
@@ -292,12 +582,41 @@ export default {
         ],
       };
     },
+    hasIssues() {
+      return this.results.issues && this.results.issues.length > 0;
+    },
+    metadataIssues() {
+      console.log(this.results.issues);
+
+      return this.results.issues?.filter((i) => i.section === "metadata") || [];
+    },
+    sopIssues() {
+      return this.results.issues?.filter((i) => i.section === "sop") || [];
+    },
   },
   methods: {
+    // selectPage(index) {
+    //   this.selectedPage = index;
+    //   localStorage.setItem("selectedPageIndex", index);
+    // },
     selectPage(index) {
-      this.selectedPage = index;
-      localStorage.setItem("selectedPageIndex", index);
+      const page = this.filteredResults[index];
+      if (!page) {
+        console.warn("Selected page not found in filteredResults.");
+        return;
+      }
+
+      const originalIndex = this.results.pages.findIndex(
+        (p) => p.url === page.url
+      );
+      if (originalIndex !== -1) {
+        this.selectedPage = originalIndex;
+        localStorage.setItem("selectedPageIndex", originalIndex);
+      } else {
+        console.warn("Page not found in original results.pages.");
+      }
     },
+
     exportToCSV() {
       const rows = this.filteredResults.map((page) => ({
         URL: page.url,
@@ -307,6 +626,7 @@ export default {
         DuplicateTitle: page.is_title_duplicate ? "Yes" : "No",
         Phone: page.phone,
         Email: page.email,
+        company_name: page.company_name,
         PhoneFormatValid: page.sop?.phone_format_valid ? "Yes" : "No",
         EmailFormatValid: page.sop?.email_format_valid ? "Yes" : "No",
         AddressFormatValid: page.sop?.address_format_valid ? "Yes" : "No",
