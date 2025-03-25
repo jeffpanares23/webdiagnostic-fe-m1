@@ -7,16 +7,16 @@
         type="url"
         class="flex-grow border rounded-lg p-3 text-gray-700 mr-4"
         placeholder="Enter URL or paste text here"
+        :disabled="loading || hasScanned"
         required
       />
       <button
         type="button"
-        @click="submitUrl"
+        @click="handleButtonClick"
         class="bg-blue-500 text-white py-3 px-6 rounded-lg flex items-center justify-center transition"
         :disabled="loading"
       >
-        <span v-if="!loading">GO!</span>
-        <span v-else class="flex items-center">
+        <span v-if="loading" class="flex items-center">
           <svg
             class="animate-spin h-5 w-5 mr-2 text-white"
             xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +37,11 @@
               d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
             ></path>
           </svg>
-          Loading...
+          Scanning...
+        </span>
+        <span v-else>
+          <!-- If hasScanned is true, show "Scan Another" else "GO!" -->
+          {{ hasScanned ? "Scan Another Website" : "GO!" }}
         </span>
       </button>
     </div>
@@ -50,8 +54,15 @@ import axios from "axios";
 import baseUrl from "../config";
 
 export default {
-  props: ["modelValue"], // Bind to parent component
-  emits: ["update:modelValue", "loading", "results"], // Declare emitted events
+  name: "WebsiteInput",
+  props: {
+    modelValue: String, // existing v-model binding
+    hasScanned: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ["update:modelValue", "loading", "results", "reset"], // Declare emitted events
 
   data() {
     return {
@@ -70,6 +81,18 @@ export default {
     },
   },
   methods: {
+    handleButtonClick() {
+      // If we've already scanned, the user wants to start a fresh scan
+      if (this.hasScanned && !this.loading) {
+        // Emit an event to reset in the parent
+        this.$emit("reset");
+        return;
+      }
+
+      // Otherwise, proceed with scanning
+      this.submitUrl();
+    },
+
     async submitUrl() {
       this.errorMessage = "";
       this.loading = true;
@@ -101,6 +124,7 @@ export default {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
           }
         );
@@ -112,19 +136,6 @@ export default {
         }
 
         console.log(response.data);
-
-        // const pagesData = response.data.pages.map((page) => ({
-        //   url: page.url,
-        //   title: page.title || "N/A",
-        //   title_length: page.title_length || "N/A",
-        //   description: page.description || "N/A",
-        //   description_length: page.description_length || "N/A",
-        //   hasHttps: page.hasHttps ? "Yes" : "No",
-        //   address: page.address || "N/A",
-        //   phone: page.phone_number || "N/A",
-        //   email: page.email_address || "N/A",
-        // }));
-
         const pagesData = response.data.pages.map((page) => ({
           url: page.url,
           title: page.title || "N/A",

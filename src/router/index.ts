@@ -4,12 +4,17 @@ import Login from "@/views/Login.vue";
 
 // Define Routes
 const routes: Array<RouteRecordRaw> = [
-  { path: "/", name: "Login", component: Login },
+  {
+    path: "/",
+    name: "Login",
+    component: Login,
+    meta: { title: "Web Diagnostic Tool | Login" },
+  },
   {
     path: "/dashboard",
     name: "DiagnosticDashboard",
     component: DashboardView,
-    meta: { requiresAuth: true, title: "Dashboard" },
+    meta: { requiresAuth: true, title: "Web Diagnostic | Dashboard" },
   },
   // // Not Found Page
   // {

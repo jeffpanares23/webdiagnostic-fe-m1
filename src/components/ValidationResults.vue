@@ -54,24 +54,50 @@
               <th class="px-2 py-1">Title</th>
               <th class="px-2 py-1">Meta Desc</th>
               <th class="px-2 py-1">HTTPS</th>
-              <th class="px-2 py-1">Status</th>
+              <!-- <th class="px-2 py-1">Status</th> -->
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(page, index) in filteredResults"
-              :key="index"
-              class="hover:bg-blue-50 border-b cursor-pointer"
-              @click="selectPage(index)"
-            >
-              <td class="px-2 py-1 text-center">{{ index + 1 }}</td>
-              <td class="px-2 py-1 text-blue-600 underline break-all">
-                {{ page.url }}
-              </td>
-              <td class="px-2 py-1">{{ page.title }}</td>
-              <td class="px-2 py-1">{{ page.description || "—" }}</td>
-              <td class="px-2 py-1">{{ page.hasHttps }}</td>
-              <td class="px-2 py-1">
+            <template v-if="loading">
+              <tr v-for="n in 5" :key="n" class="border-b">
+                <td class="px-2 py-1 text-center">
+                  <div class="animate-pulse bg-gray-300 h-4 w-4 rounded"></div>
+                </td>
+                <td class="px-2 py-1">
+                  <div
+                    class="animate-pulse bg-gray-300 h-4 w-full rounded"
+                  ></div>
+                </td>
+                <td class="px-2 py-1">
+                  <div
+                    class="animate-pulse bg-gray-300 h-4 w-full rounded"
+                  ></div>
+                </td>
+                <td class="px-2 py-1">
+                  <div
+                    class="animate-pulse bg-gray-300 h-4 w-full rounded"
+                  ></div>
+                </td>
+                <td class="px-2 py-1">
+                  <div class="animate-pulse bg-gray-300 h-4 w-8 rounded"></div>
+                </td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr
+                v-for="(page, index) in filteredResults"
+                :key="index"
+                class="hover:bg-blue-50 border-b cursor-pointer"
+                @click="selectPage(index)"
+              >
+                <td class="px-2 py-1 text-center">{{ index + 1 }}</td>
+                <td class="px-2 py-1 text-blue-600 underline break-all">
+                  {{ page.url }}
+                </td>
+                <td class="px-2 py-1">{{ page.title }}</td>
+                <td class="px-2 py-1">{{ page.description || "—" }}</td>
+                <td class="px-2 py-1">{{ page.hasHttps }}</td>
+                <!-- <td class="px-2 py-1">
                 <span
                   v-if="page.is_description_missing || !page.is_title_ideal"
                   class="text-red-600"
@@ -85,8 +111,9 @@
                   >⚠️ Warnings</span
                 >
                 <span v-else class="text-green-600">✅ Valid</span>
-              </td>
-            </tr>
+              </td> -->
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -363,13 +390,12 @@
           <div
             v-for="(issue, index) in filteredIssuesToFix"
             :key="index"
-            class="flex items-center p-3 border-l-4 rounded-md shadow-sm transition-all duration-200 hover:shadow-lg cursor-pointer"
+            class="flex items-center p-3 border-l-4 rounded-md shadow-sm transition-all duration-200 hover:shadow-lg"
             :class="{
               'bg-red-50 border-red-500': issue.priority === 'HIGH',
               'bg-yellow-50 border-yellow-500': issue.priority === 'MEDIUM',
               'bg-green-50 border-green-500': issue.priority === 'LOW',
             }"
-            @click="scrollToSection(issue.section)"
           >
             <span
               class="text-xs font-bold px-3 py-1 min-w-20 text-center rounded"
@@ -478,6 +504,10 @@ export default {
       type: Object,
       default: () => ({ pages: [] }),
     },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -526,7 +556,8 @@ export default {
       );
     },
     filteredResults() {
-      return this.results.pages.filter((page) => {
+      return (this.results.pages || []).filter((page) => {
+        if (!page) return false;
         const matchTitle =
           this.filters.titleStatus === "" ||
           (this.filters.titleStatus === "ideal" && page.is_title_ideal) ||

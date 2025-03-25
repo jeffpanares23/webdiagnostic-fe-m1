@@ -194,6 +194,7 @@ export default {
           error.response?.data?.message || error.message
         );
         this.error = error.response?.data?.message || "An error occurred.";
+        this.loading = false;
       }
     },
   },

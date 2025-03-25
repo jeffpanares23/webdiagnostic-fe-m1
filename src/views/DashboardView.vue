@@ -1,12 +1,12 @@
 <template>
   <div class="flex flex-col lg:flex-row p-6 m-auto">
     <!-- 📌 Sidebar Toggle Button for Mobile -->
-    <button
+    <!-- <button
       class="lg:hidden bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
       @click="sidebarOpen = !sidebarOpen"
     >
       ☰ History
-    </button>
+    </button> -->
 
     <!-- 📌 Overlay when Sidebar is Open -->
     <div
@@ -46,7 +46,9 @@
         placeholder="Enter website URL..."
         @loading="setLoading"
         @results="handleResults"
+        @reset="resetScan"
         v-model="websiteUrl"
+        :hasScanned="hasScanned"
       />
 
       <!-- 📌 Tabs Navigation -->
@@ -67,7 +69,7 @@
       <!-- 📌 Tab Content -->
       <div v-if="activeTab === 'Results'">
         <ValidationResults v-if="results" :results="results" />
-        <ExportButtons v-if="results" :results="results" />
+        <!-- <ExportButtons v-if="results" :results="results" /> -->
       </div>
 
       <!-- 📌 Empty State Message with Tips -->
@@ -98,6 +100,50 @@
           <div class="progress-bar mt-4">
             <div class="progress" :style="{ width: progress + '%' }"></div>
           </div>
+
+          <div class="w-full mt-4">
+            <table class="w-full">
+              <thead class="bg-gray-100 sticky top-0 z-10">
+                <tr>
+                  <th class="px-2 py-1">#</th>
+                  <th class="px-2 py-1">URL</th>
+                  <th class="px-2 py-1">Title</th>
+                  <th class="px-2 py-1">Meta Desc</th>
+                  <th class="px-2 py-1">HTTPS</th>
+                  <!-- <th class="px-2 py-1">Status</th> -->
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="n in 5" :key="n" class="border-b">
+                  <td class="px-2 py-1 text-center flex justify-center">
+                    <div
+                      class="animate-pulse bg-gray-300 h-4 w-4 rounded"
+                    ></div>
+                  </td>
+                  <td class="px-2 py-1">
+                    <div
+                      class="animate-pulse bg-gray-300 h-4 w-full rounded"
+                    ></div>
+                  </td>
+                  <td class="px-2 py-1">
+                    <div
+                      class="animate-pulse bg-gray-300 h-4 w-full rounded"
+                    ></div>
+                  </td>
+                  <td class="px-2 py-1">
+                    <div
+                      class="animate-pulse bg-gray-300 h-4 w-full rounded"
+                    ></div>
+                  </td>
+                  <td class="px-2 py-1">
+                    <div
+                      class="animate-pulse bg-gray-300 h-4 w-8 rounded"
+                    ></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </transition>
     </div>
@@ -108,7 +154,7 @@
 import SubNavigation from "../components/SubNavigation.vue";
 import WebsiteInput from "../components/WebsiteInput.vue";
 import ValidationResults from "../components/ValidationResults.vue";
-import ExportButtons from "../components/ExportButtons.vue";
+// import ExportButtons from "../components/ExportButtons.vue";
 import HistorySidebar from "../components/HistorySidebar.vue";
 import axios from "axios";
 import baseUrl from "../config";
@@ -118,7 +164,7 @@ export default {
     SubNavigation,
     WebsiteInput,
     ValidationResults,
-    ExportButtons,
+    // ExportButtons,
     // HistorySidebar,
   },
   data() {
@@ -139,6 +185,8 @@ export default {
       activeTab: "Results",
       history: {},
       sidebarOpen: false, // 📌 Controls Sidebar Visibility
+
+      hasScanned: false,
     };
   },
   mounted() {
@@ -194,6 +242,8 @@ export default {
         issues: Array.isArray(newResults.issues) ? newResults.issues : [],
       };
 
+      this.hasScanned = true;
+
       this.fetchHistory();
     },
     setLoading() {
@@ -214,6 +264,12 @@ export default {
           index++;
         }
       }, 3000);
+    },
+    resetScan() {
+      // Clear everything for a new scan
+      this.hasScanned = false;
+      this.results = null;
+      this.websiteUrl = "";
     },
   },
 };
