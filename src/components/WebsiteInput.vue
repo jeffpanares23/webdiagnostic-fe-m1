@@ -1,7 +1,10 @@
 <template>
   <div class="bg-white shadow-md rounded-lg p-6">
     <h2 class="text-lg font-semibold mb-4">Run Diagnostic</h2>
-    <div class="flex justify-between items-center">
+    <form
+      @submit.prevent="handleButtonClick"
+      class="flex justify-between items-center"
+    >
       <input
         v-model="websiteUrl"
         type="url"
@@ -13,8 +16,13 @@
       <button
         type="button"
         @click="handleButtonClick"
-        class="bg-blue-500 text-white py-3 px-6 rounded-lg flex items-center justify-center transition"
-        :disabled="loading"
+        :class="[
+          'py-3 px-6 rounded-lg flex items-center justify-center transition',
+          loading || !isValidUrl(websiteUrl.trim())
+            ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+            : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer',
+        ]"
+        :disabled="loading || !isValidUrl(websiteUrl.trim())"
       >
         <span v-if="loading" class="flex items-center">
           <svg
@@ -44,8 +52,7 @@
           {{ hasScanned ? "Scan Another Website" : "GO!" }}
         </span>
       </button>
-    </div>
-    <p v-if="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
+    </form>
   </div>
 </template>
 
@@ -62,7 +69,7 @@ export default {
       default: false,
     },
   },
-  emits: ["update:modelValue", "loading", "results", "reset"], // Declare emitted events
+  emits: ["update:modelValue", "loading", "results", "reset", "error"], // Declare emitted events
 
   data() {
     return {
@@ -81,10 +88,22 @@ export default {
     },
   },
   methods: {
+    isValidUrl(value) {
+      const pattern = new RegExp(
+        "^(https?:\\/\\/)?" + // optional http/https
+          "((([a-z\\d]([a-z\\d-]*[a-z\\d])*))\\.)+[a-z]{2,}" + // domain name
+          "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // optional port and path
+          "(\\?[;&a-z\\d%_.~+=-]*)?" + // optional query
+          "(\\#[-a-z\\d_]*)?$", // optional fragment
+        "i"
+      );
+      return !!pattern.test(value);
+    },
     handleButtonClick() {
       // If we've already scanned, the user wants to start a fresh scan
       if (this.hasScanned && !this.loading) {
-        // Emit an event to reset in the parent
+        this.errorMessage = ""; // Clear local error
+        this.$emit("error", ""); // Clear parent error
         this.$emit("reset");
         return;
       }
@@ -100,6 +119,12 @@ export default {
 
       if (!this.websiteUrl || this.websiteUrl.trim() === "") {
         this.errorMessage = "Please enter a valid URL.";
+        this.loading = false;
+        return;
+      }
+
+      if (!this.isValidUrl(this.websiteUrl.trim())) {
+        this.errorMessage = "Invalid URL format. Please enter a valid URL.";
         this.loading = false;
         return;
       }
@@ -152,12 +177,20 @@ export default {
           issues: page.issues || [],
         }));
 
+        if (!pagesData.length) {
+          this.errorMessage =
+            "No valid pages found. The website might be unreachable or empty.";
+          this.$emit("error", this.errorMessage);
+          return;
+        }
+
         // Emit all pages data
         this.$emit("results", { pages: pagesData });
       } catch (error) {
         this.errorMessage =
           error.response?.data?.error ||
           "An error occurred while processing the URL.";
+        this.$emit("error", this.errorMessage); // 🔥 Send to parent
         console.error("API Error:", error);
       } finally {
         this.loading = false;

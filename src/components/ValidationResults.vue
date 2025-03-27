@@ -119,14 +119,11 @@
       </div>
 
       <!-- Bottom Panel: Tabbed Page Details -->
-      <div
-        v-if="selectedPage !== null"
-        class="mt-4 border rounded p-3 bg-gray-50"
-      >
+      <div v-if="selectedPage" class="mt-4 border rounded p-3 bg-gray-50">
         <div class="mb-2">
-          <h3 class="font-semibold text-sm">
+          <h3 class="font-semibold text-sm" v-if="currentPage?.url">
             Details for:
-            <span class="text-blue-600">{{ currentPage.url }}</span>
+            <span class="text-blue-600">{{ currentPage?.url || "N/A" }}</span>
           </h3>
         </div>
         <div class="flex text-sm">
@@ -146,7 +143,7 @@
         </div>
 
         <!-- Tab Content -->
-        <div class="text-sm">
+        <div class="text-sm" v-if="currentPage">
           <div v-if="activeTab === 'Meta Data'">
             <div class="metadata bg-gray-50 p-4 rounded-md border">
               <h3 class="text-md font-semibold mb-2">Metadata Validation</h3>
@@ -156,13 +153,15 @@
                 <p class="font-bold">Meta Title Test</p>
                 <p>
                   <strong>Text: </strong>
-                  <span v-if="currentPage.title">{{ currentPage.title }}</span>
+                  <span v-if="currentPage.title">{{
+                    currentPage?.title || "No Meta Title Found"
+                  }}</span>
                   <span v-else class="text-gray-400">No Meta Title Found</span>
                 </p>
                 <p>
                   <strong>Length: </strong>
                   <span v-if="currentPage.title_length">
-                    {{ currentPage.title_length }} characters
+                    {{ currentPage?.title_length || 0 }} characters
                   </span>
                   <span v-else class="text-gray-400">No Data</span>
                 </p>
@@ -427,7 +426,7 @@
       >
         <h3 class="text-md font-semibold mb-2">📄 Metadata Issues</h3>
         <PageIssuesPanel
-          :issues="currentPage.issues || []"
+          :issues="currentPage?.issues || []"
           section="metadata"
         />
       </div>
@@ -484,7 +483,7 @@
             </a>
           </div>
         </div> -->
-        <PageIssuesPanel :issues="currentPage.issues || []" section="sop" />
+        <PageIssuesPanel :issues="currentPage?.issues || []" section="sop" />
         <!-- <PageIssuesPanel :issues="currentPage.issues || []" section="sop" /> -->
       </div>
     </div>
@@ -512,6 +511,7 @@ export default {
   data() {
     return {
       selectedPage: null,
+      scanError: "",
       activeTab: "Meta Data",
       tabs: ["Meta Data", "SOP Compliance"],
       filters: {
@@ -535,7 +535,7 @@ export default {
     },
     // How many SOP fields are valid
     sopCompliancePassed() {
-      if (!this.currentPage.sop) return 0;
+      if (!this.currentPage?.sop) return 0;
       let count = 0;
       if (this.currentPage.sop.phone_format_valid) count++;
       if (this.currentPage.sop.email_format_valid) count++;
@@ -595,20 +595,22 @@ export default {
     filteredIssuesToFix() {
       if (!this.currentPage || !this.currentPage.issues) return [];
 
-      return this.currentPage.issues.filter((issue) => {
-        if (this.activeTab === "Meta Data") {
-          return (
-            issue.section === "metadata" &&
-            !issue.message.toLowerCase().includes("https")
-          );
-        } else if (this.activeTab === "SOP Compliance") {
-          return (
-            issue.section === "sop" ||
-            issue.message.toLowerCase().includes("https")
-          );
-        }
-        return false;
-      });
+      return (
+        this.currentPage.issues.filter((issue) => {
+          if (this.activeTab === "Meta Data") {
+            return (
+              issue.section === "metadata" &&
+              !issue.message.toLowerCase().includes("https")
+            );
+          } else if (this.activeTab === "SOP Compliance") {
+            return (
+              issue.section === "sop" ||
+              issue.message.toLowerCase().includes("https")
+            );
+          }
+          return false;
+        }) || []
+      );
     },
     // currentPage() {
     //   return this.selectedPage !== null
@@ -618,7 +620,7 @@ export default {
     currentPage() {
       return this.selectedPage !== null
         ? this.results.pages[this.selectedPage]
-        : {};
+        : null;
     },
 
     chartData() {
@@ -653,28 +655,27 @@ export default {
       if (!this.results.pages) return [];
       return this.results.pages.flatMap((page) => page.issues || []);
     },
-    // metadataIssues() {
-    //   console.log(this.results.issues);
-
-    //   return this.results.issues?.filter((i) => i.section === "metadata") || [];
-    // },
-    // sopIssues() {
-    //   return this.results.issues?.filter((i) => i.section === "sop") || [];
-    // },
     metadataIssues() {
-      if (!this.currentPage || !this.currentPage.issues) return [];
-      return this.currentPage.issues.filter((i) => i.section === "metadata");
+      console.log(this.results.issues);
+
+      return this.results.issues?.filter((i) => i.section === "metadata") || [];
     },
     sopIssues() {
-      if (!this.currentPage || !this.currentPage.issues) return [];
-      return this.currentPage.issues.filter((i) => i.section === "sop");
+      return this.results.issues?.filter((i) => i.section === "sop") || [];
     },
+    // metadataIssues() {
+    //   if (!this.currentPage || !this.currentPage.issues) return [];
+    //   return this.currentPage.issues.filter((i) => i.section === "metadata");
+    // },
+    // sopIssues() {
+    //   if (!this.currentPage || !this.currentPage.issues) return [];
+    //   return this.currentPage.issues.filter((i) => i.section === "sop");
+    // },
   },
   methods: {
-    // selectPage(index) {
-    //   this.selectedPage = index;
-    //   localStorage.setItem("selectedPageIndex", index);
-    // },
+    handleScanError(errorMessage) {
+      this.scanError = errorMessage;
+    },
     getExplanation(issue) {
       return issue.explanation || "";
     },

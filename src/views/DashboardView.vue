@@ -47,9 +47,25 @@
         @loading="setLoading"
         @results="handleResults"
         @reset="resetScan"
+        @error="handleScanError"
         v-model="websiteUrl"
         :hasScanned="hasScanned"
       />
+
+      <div
+        v-if="scanError && !loading"
+        class="flex justify-between items-center text-red-600 bg-red-50 p-6 rounded shadow mt-6"
+      >
+        <div>
+          <h3 class="text-lg font-semibold mb-2">
+            Oops! Something went wrong.
+          </h3>
+          <p>{{ scanError }}</p>
+        </div>
+        <button @click="scanError = ''" class="text-red-500 hover:text-red-700">
+          ✖
+        </button>
+      </div>
 
       <!-- 📌 Tabs Navigation -->
       <div v-if="results">
@@ -185,7 +201,7 @@ export default {
       activeTab: "Results",
       history: {},
       sidebarOpen: false, // 📌 Controls Sidebar Visibility
-
+      scanError: "",
       hasScanned: false,
     };
   },
@@ -235,7 +251,7 @@ export default {
     // },
     handleResults(newResults) {
       this.loading = false;
-
+      this.scanError = "";
       // ✅ Ensure newResults is always valid
       this.results = {
         ...newResults,
@@ -243,8 +259,12 @@ export default {
       };
 
       this.hasScanned = true;
-
       this.fetchHistory();
+    },
+    handleScanError(errorMessage) {
+      this.loading = false;
+      this.results = null;
+      this.scanError = errorMessage;
     },
     setLoading() {
       this.loading = true;
@@ -270,6 +290,7 @@ export default {
       this.hasScanned = false;
       this.results = null;
       this.websiteUrl = "";
+      this.scanError = "";
     },
   },
 };
