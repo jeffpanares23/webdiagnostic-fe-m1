@@ -48,11 +48,13 @@
           Scanning...
         </span>
         <span v-else>
-          <!-- If hasScanned is true, show "Scan Another" else "GO!" -->
           {{ hasScanned ? "Scan Another Website" : "GO!" }}
         </span>
       </button>
     </form>
+
+    <!-- Optional error display -->
+    <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
   </div>
 </template>
 
@@ -63,13 +65,13 @@ import baseUrl from "../config";
 export default {
   name: "WebsiteInput",
   props: {
-    modelValue: String, // existing v-model binding
+    modelValue: String,
     hasScanned: {
       type: Boolean,
       default: false,
     },
   },
-  emits: ["update:modelValue", "loading", "results", "reset", "error"], // Declare emitted events
+  emits: ["update:modelValue", "loading", "results", "reset", "error"],
 
   data() {
     return {
@@ -77,38 +79,38 @@ export default {
       loading: false,
     };
   },
+
   computed: {
     websiteUrl: {
       get() {
-        return this.modelValue || ""; // Get value from parent
+        return this.modelValue || "";
       },
       set(value) {
-        this.$emit("update:modelValue", value); // Update parent when input changes
+        this.$emit("update:modelValue", value);
       },
     },
   },
+
   methods: {
     isValidUrl(value) {
       const pattern = new RegExp(
-        "^(https?:\\/\\/)?" + // optional http/https
-          "((([a-z\\d]([a-z\\d-]*[a-z\\d])*))\\.)+[a-z]{2,}" + // domain name
-          "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // optional port and path
-          "(\\?[;&a-z\\d%_.~+=-]*)?" + // optional query
-          "(\\#[-a-z\\d_]*)?$", // optional fragment
+        "^(https?:\\/\\/)?" +
+          "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,})" +
+          "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" +
+          "(\\?[;&a-z\\d%_.~+=-]*)?" +
+          "(\\#[-a-z\\d_]*)?$",
         "i"
       );
       return !!pattern.test(value);
     },
+
     handleButtonClick() {
-      // If we've already scanned, the user wants to start a fresh scan
       if (this.hasScanned && !this.loading) {
-        this.errorMessage = ""; // Clear local error
-        this.$emit("error", ""); // Clear parent error
+        this.errorMessage = "";
+        this.$emit("error", "");
         this.$emit("reset");
         return;
       }
-
-      // Otherwise, proceed with scanning
       this.submitUrl();
     },
 
@@ -117,25 +119,14 @@ export default {
       this.loading = true;
       this.$emit("loading");
 
-      if (!this.websiteUrl || this.websiteUrl.trim() === "") {
-        this.errorMessage = "Please enter a valid URL.";
-        this.loading = false;
-        return;
-      }
-
-      if (!this.isValidUrl(this.websiteUrl.trim())) {
+      const formattedUrl = this.websiteUrl.trim();
+      if (!this.isValidUrl(formattedUrl)) {
         this.errorMessage = "Invalid URL format. Please enter a valid URL.";
         this.loading = false;
         return;
       }
 
-      let formattedUrl = this.websiteUrl.trim();
-      if (!/^https?:\/\//i.test(formattedUrl)) {
-        formattedUrl = "http://" + formattedUrl;
-      }
-
       const token = localStorage.getItem("token");
-
       if (!token) {
         this.errorMessage = "You are not authenticated. Please log in.";
         this.loading = false;
@@ -143,7 +134,8 @@ export default {
       }
 
       try {
-        const response = await axios.post(
+        // Step 1: Send URL to backend to start queued job
+        const startRes = await axios.post(
           `${baseUrl}/api/analyze-website`,
           { url: formattedUrl },
           {
@@ -154,47 +146,46 @@ export default {
           }
         );
 
-        if (!response.data || response.data.error) {
-          throw new Error(
-            response.data.error || "Invalid response from server."
-          );
-        }
+        const jobId = startRes.data.job_id;
+        if (!jobId) throw new Error("No job ID returned.");
 
-        console.log(response.data);
-        const pagesData = response.data.pages.map((page) => ({
-          url: page.url,
-          title: page.title || "N/A",
-          title_length: page.title_length || "N/A",
-          description: page.description || "N/A",
-          description_length: page.description_length || "N/A",
-          hasHttps: page.hasHttps ? "Yes" : "No",
-          address: page.address || "N/A",
-          phone: page.phone_number || "N/A",
-          email: page.email_address || "N/A",
-          company_name: page.company_name || "N/A",
-          copyright: page.copyright || "N/A",
-          sop: page.sop || {},
-          issues: page.issues || [],
-        }));
-
-        if (!pagesData.length) {
-          this.errorMessage =
-            "No valid pages found. The website might be unreachable or empty.";
-          this.$emit("error", this.errorMessage);
-          return;
-        }
-
-        // Emit all pages data
-        this.$emit("results", { pages: pagesData });
-      } catch (error) {
+        // Step 2: Start polling scan status
+        this.pollScanStatus(jobId);
+      } catch (err) {
         this.errorMessage =
-          error.response?.data?.error ||
-          "An error occurred while processing the URL.";
-        this.$emit("error", this.errorMessage); // 🔥 Send to parent
-        console.error("API Error:", error);
-      } finally {
+          err.response?.data?.error || "Error initiating scan.";
+        this.$emit("error", this.errorMessage);
         this.loading = false;
       }
+    },
+
+    pollScanStatus(jobId) {
+      const interval = setInterval(async () => {
+        try {
+          const response = await axios.get(
+            `${baseUrl}/api/scan-status/${jobId}`
+          );
+          const result = response.data;
+
+          if (result.status === "done") {
+            clearInterval(interval);
+            this.$emit("results", result.data);
+            this.loading = false;
+          } else if (result.status === "error") {
+            clearInterval(interval);
+            this.errorMessage = result.message || "Scan failed.";
+            this.$emit("error", this.errorMessage);
+            this.loading = false;
+          }
+          // else: still processing — keep polling
+        } catch (error) {
+          clearInterval(interval);
+          this.errorMessage =
+            error.response?.data?.error || "Error polling scan result.";
+          this.$emit("error", this.errorMessage);
+          this.loading = false;
+        }
+      }, 3000); // ⏱ Poll every 3 seconds
     },
   },
 };
