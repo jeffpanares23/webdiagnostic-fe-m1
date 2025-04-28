@@ -1,12 +1,10 @@
 <template>
-  <div
-    class="sub-navigation bg-white rounded-lg p-4 flex items-center justify-between"
-  >
+  <div class="sub-navigation p-4 flex items-center justify-between">
     <!-- Navigation History -->
     <div class="nav-history text-xl text-gray-600">
       <!-- <span>Apps</span> / -->
       <span>Website Diagnostic Tool </span>
-      <span class="text-xs text-blue-500">Version M.1.0</span>
+      <span class="text-xs text-blue-500">&nbsp; Version M.1.0</span>
     </div>
 
     <!-- Search Bar -->
@@ -33,6 +31,7 @@
         content="Logout"
         v-tippy="{ placement: 'left' }"
       >
+        <span class="text-blue-500">Logout</span>
         <i class="fas fa-sign-out-alt text-2xl"></i>
       </button>
       <!-- Tooltip -->
