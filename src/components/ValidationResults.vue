@@ -1,7 +1,7 @@
 <template>
   <div class="grid grid-cols-12 gap-4">
     <!-- Left: Main Results Table -->
-    <div class="col-span-9">
+    <div class="col-span-9 bg-white p-8">
       <div class="mb-4 flex justify-between items-center">
         <h2 class="text-lg font-semibold">Scanned Pages</h2>
         <button
@@ -14,24 +14,30 @@
 
       <!-- Per-column Filters -->
       <div class="grid grid-cols-6 gap-2 mb-2 text-xs">
-        <select v-model="filters.titleStatus" class="border p-1 rounded">
+        <select
+          v-model="filters.titleStatus"
+          class="border p-1 rounded filters"
+        >
           <option value="">All Titles</option>
           <option value="ideal">Ideal</option>
           <option value="short">Too Short</option>
           <option value="long">Too Long</option>
         </select>
-        <select v-model="filters.metaStatus" class="border p-1 rounded">
+        <select v-model="filters.metaStatus" class="border p-1 rounded filters">
           <option value="">All Meta</option>
           <option value="valid">Valid</option>
           <option value="missing">Missing</option>
           <option value="duplicate">Duplicate</option>
         </select>
-        <select v-model="filters.https" class="border p-1 rounded">
+        <select v-model="filters.https" class="border p-1 rounded filters">
           <option value="">All HTTPS</option>
           <option value="Yes">HTTPS</option>
           <option value="No">HTTP</option>
         </select>
-        <select v-model="filters.duplicateTitle" class="border p-1 rounded">
+        <select
+          v-model="filters.duplicateTitle"
+          class="border p-1 rounded filters"
+        >
           <option value="">Duplicate Title?</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
@@ -40,20 +46,20 @@
           v-model="searchQuery"
           type="text"
           placeholder="Search URL..."
-          class="border p-1 rounded col-span-2"
+          class="border p-1 px-2 rounded col-span-2 text-[1rem]"
         />
       </div>
 
       <!-- Results Table -->
       <div class="overflow-y-auto max-h-[420px] border rounded text-xs">
         <table class="w-full">
-          <thead class="bg-gray-100 sticky top-0 z-10">
+          <thead class="sticky top-0 z-10">
             <tr>
-              <th class="px-2 py-1">#</th>
-              <th class="px-2 py-1">URL</th>
-              <th class="px-2 py-1">Title</th>
-              <th class="px-2 py-1">Meta Desc</th>
-              <th class="px-2 py-1">HTTPS</th>
+              <th class="px-2 py-1 border border-gray-200">#</th>
+              <th class="px-2 py-1 border border-gray-200">URL</th>
+              <th class="px-2 py-1 border border-gray-200">Title</th>
+              <th class="px-2 py-1 border border-gray-200">Meta Desc</th>
+              <th class="px-2 py-1 border border-gray-200">HTTPS</th>
               <!-- <th class="px-2 py-1">Status</th> -->
             </tr>
           </thead>
@@ -63,22 +69,22 @@
                 <td class="px-2 py-1 text-center">
                   <div class="animate-pulse bg-gray-300 h-4 w-4 rounded"></div>
                 </td>
-                <td class="px-2 py-1">
+                <td class="px-2 py-1 text-center">
                   <div
                     class="animate-pulse bg-gray-300 h-4 w-full rounded"
                   ></div>
                 </td>
-                <td class="px-2 py-1">
+                <td class="px-2 py-1 text-center">
                   <div
                     class="animate-pulse bg-gray-300 h-4 w-full rounded"
                   ></div>
                 </td>
-                <td class="px-2 py-1">
+                <td class="px-2 py-1 text-center">
                   <div
                     class="animate-pulse bg-gray-300 h-4 w-full rounded"
                   ></div>
                 </td>
-                <td class="px-2 py-1">
+                <td class="px-2 py-1 text-center">
                   <div class="animate-pulse bg-gray-300 h-4 w-8 rounded"></div>
                 </td>
               </tr>
@@ -90,13 +96,23 @@
                 class="hover:bg-blue-50 border-b cursor-pointer"
                 @click="selectPage(index)"
               >
-                <td class="px-2 py-1 text-center">{{ index + 1 }}</td>
-                <td class="px-2 py-1 text-blue-600 underline break-all">
+                <td class="px-2 py-1 text-center border border-gray-200">
+                  {{ index + 1 }}
+                </td>
+                <td
+                  class="px-2 py-1 text-center text-blue-600 underline break-all border border-gray-200"
+                >
                   {{ page.url }}
                 </td>
-                <td class="px-2 py-1">{{ page.title }}</td>
-                <td class="px-2 py-1">{{ page.description || "—" }}</td>
-                <td class="px-2 py-1">{{ page.hasHttps }}</td>
+                <td class="px-2 py-1 text-center border border-gray-200">
+                  {{ page.title }}
+                </td>
+                <td class="px-2 py-1 text-center border border-gray-200">
+                  {{ page.description || "—" }}
+                </td>
+                <td class="px-2 py-1 text-center border border-gray-200">
+                  {{ page.hasHttps }}
+                </td>
                 <!-- <td class="px-2 py-1">
                 <span
                   v-if="page.is_description_missing || !page.is_title_ideal"
@@ -377,13 +393,13 @@
     </div>
 
     <!-- Right: Chart Sidebar -->
-    <div class="col-span-3 bg-white border rounded p-3 text-sm">
-      <h3 class="font-semibold mb-2">Validation Summary</h3>
+    <div class="col-span-3 bg-white rounded text-sm max-h-96">
+      <h3 class="font-semibold mb-2 text-base p-8">Validation Summary</h3>
       <PieChart :chart-data="chartData" />
     </div>
     <!-- Issues to Fix Section -->
     <div class="col-span-12 mt-4">
-      <div class="issues-to-fix bg-white p-4 rounded-md border">
+      <div class="issues-to-fix bg-white p-4 rounded-md">
         <h3 class="text-md font-semibold mb-2">🚨 Issues to Fix</h3>
         <div v-if="hasIssues" class="space-y-3">
           <div
@@ -421,7 +437,7 @@
       <div
         v-if="activeTab === 'Meta Data'"
         ref="metadataIssues"
-        class="metadata-issues bg-white p-4 rounded-md border mt-4"
+        class="metadata-issues bg-white p-4 rounded-md mt-4"
         :class="{ 'highlight-section': highlight === 'metadata' }"
       >
         <h3 class="text-md font-semibold mb-2">📄 Metadata Issues</h3>
@@ -435,7 +451,7 @@
       <div
         v-if="activeTab === 'SOP Compliance'"
         ref="sopIssues"
-        class="sop-issues bg-white p-4 rounded-md border mt-4"
+        class="sop-issues bg-white p-4 rounded-md mt-4"
         :class="{ 'highlight-section': highlight === 'sop' }"
       >
         <h3 class="text-sm font-semibold mb-2">🏢 SOP Compliance Issues</h3>
@@ -740,3 +756,19 @@ export default {
   },
 };
 </script>
+<style scoped>
+.filters {
+  background: #f0f7fe;
+  font-size: 1rem;
+  padding-inline: 0.5rem;
+  border: none;
+}
+th {
+  font-weight: 500;
+  background: #f0f7fe;
+}
+th,
+td {
+  font-size: 1rem;
+}
+</style>

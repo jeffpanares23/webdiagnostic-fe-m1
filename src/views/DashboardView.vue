@@ -37,7 +37,7 @@
     </div> -->
 
     <!-- 📌 Main Content -->
-    <div class="lg:w-3/4 w-full flex-1 p-4 pt-0 container mx-auto space-y-6">
+    <div class="lg:w-3/4 w-full flex-1 p-4 pt-0 container mx-auto">
       <SubNavigation />
 
       <!-- 📌 Improved Search Input -->
@@ -69,7 +69,7 @@
 
       <!-- 📌 Tabs Navigation -->
       <div v-if="results">
-        <div class="tabs flex space-x-4 border-b">
+        <div class="tabs flex space-x-4">
           <button
             v-for="tab in tabs"
             :key="tab"
@@ -85,27 +85,16 @@
       <!-- 📌 Tab Content -->
       <div v-if="activeTab === 'Results'">
         <ValidationResults v-if="results" :results="results" />
-        <!-- <ExportButtons v-if="results" :results="results" /> -->
       </div>
 
-      <!-- 📌 Empty State Message with Tips -->
-      <div v-if="!results && !loading" class="text-center mt-10">
+      <!-- Illustration -->
+      <div v-if="!results && !loading" class="mt-10">
         <img
-          src="@/assets/Web-search.gif"
-          class="w-2/3 md:w-1/3 opacity-75 m-auto"
+          src="@/assets/illustrations/diagnostic-illustration.png"
+          alt="Website Diagnostic Illustration"
+          class="w-2/3 md:w-1/2 m-auto"
         />
-        <p class="text-gray-500 mt-4">
-          Start diagnosing a website by entering a URL above.
-        </p>
-        <p class="text-sm text-gray-400">Try: www.example.com</p>
       </div>
-
-      <!-- 📌 Loading Indicator -->
-      <!-- <transition name="fade">
-        <div v-if="loading" class="text-center text-gray-500">
-          Scanning website...
-        </div>
-      </transition> -->
       <transition name="slide-expand">
         <div
           v-if="loading"
@@ -170,8 +159,6 @@
 import SubNavigation from "../components/SubNavigation.vue";
 import WebsiteInput from "../components/WebsiteInput.vue";
 import ValidationResults from "../components/ValidationResults.vue";
-// import ExportButtons from "../components/ExportButtons.vue";
-import HistorySidebar from "../components/HistorySidebar.vue";
 import axios from "axios";
 import baseUrl from "../config";
 
@@ -180,8 +167,6 @@ export default {
     SubNavigation,
     WebsiteInput,
     ValidationResults,
-    // ExportButtons,
-    // HistorySidebar,
   },
   data() {
     return {
@@ -244,11 +229,6 @@ export default {
       this.results = selectedResult;
       this.sidebarOpen = false; // 📌 Close sidebar on mobile after selecting
     },
-    // handleResults(newResults) {
-    //   this.loading = false;
-    //   this.results = newResults;
-    //   this.fetchHistory();
-    // },
     handleResults(newResults) {
       this.loading = false;
       this.scanError = "";
@@ -341,12 +321,12 @@ export default {
 }
 
 /* 📌 Improved Search Input */
-.input-box {
+/* .input-box {
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   padding: 10px 14px;
   transition: all 0.3s ease;
-}
+} */
 .input-box:focus {
   border-color: #3b82f6;
   box-shadow: 0px 0px 8px rgba(59, 130, 246, 0.3);
@@ -362,7 +342,6 @@ export default {
   background-color: #f9fafb;
 }
 .tab.active {
-  border-bottom: 2px solid #3b82f6;
   font-weight: bold;
 }
 

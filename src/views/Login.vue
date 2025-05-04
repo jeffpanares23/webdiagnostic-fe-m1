@@ -88,7 +88,7 @@
         <h3 class="text-xl font-semibold mb-4">Website Diagnostic Tool</h3>
         <div class="relative w-4/5">
           <img
-            src="../assets/DMSuite_Login_Illustration.svg"
+            src="../assets/illustrations/WebDiag_Login_Illustration.svg"
             alt="Illustration"
             class="rounded-md mb-4"
           />

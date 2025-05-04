@@ -1,14 +1,22 @@
 <template>
-  <div class="bg-white shadow-md rounded-lg p-6">
-    <h2 class="text-lg font-semibold mb-4">Run Diagnostic</h2>
+  <div class="mx-auto my-8 text-center border-0">
+    <!-- Header Text -->
+    <div v-if="!hasScanned">
+      <h1 class="text-4xl font-medium text-gray-900 mb-8">Run Diagnostic</h1>
+      <p class="text-gray-700 text-base">
+        Start diagnosing a website by entering a URL.
+      </p>
+      <p class="text-gray-400 mb-6 text-base">Try: https://example.com</p>
+    </div>
+    <!-- Input + Button -->
     <form
       @submit.prevent="handleButtonClick"
-      class="flex justify-between items-center"
+      class="flex flex-col sm:flex-row items-center gap-4 justify-center"
     >
       <input
         v-model="websiteUrl"
         type="url"
-        class="flex-grow border rounded-lg p-3 text-gray-700 mr-4"
+        class="w-full sm:w-[400px] max-w-4xl md:w-3/5 px-5 py-4 text-gray-700 placeholder-gray-400 rounded-xl border border-[#3B81F6] focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
         placeholder="Enter URL or paste text here"
         :disabled="loading || hasScanned"
         required
@@ -17,44 +25,44 @@
         type="button"
         @click="handleButtonClick"
         :class="[
-          'py-3 px-6 rounded-lg flex items-center justify-center transition',
+          'flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-white transition font-semibold',
           loading || !isValidUrl(websiteUrl.trim())
-            ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-            : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer',
+            ? 'bg-gray-300 cursor-not-allowed'
+            : 'bg-blue-600 hover:bg-blue-700',
         ]"
         :disabled="loading || !isValidUrl(websiteUrl.trim())"
       >
-        <span v-if="loading" class="flex items-center">
-          <svg
-            class="animate-spin h-5 w-5 mr-2 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            ></path>
-          </svg>
-          Scanning...
-        </span>
+        <svg
+          v-if="loading"
+          class="animate-spin h-5 w-5 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          ></path>
+        </svg>
         <span v-else>
-          {{ hasScanned ? "Scan Another Website" : "GO!" }}
+          {{ hasScanned ? "Diagnose Another Website" : "Diagnose" }}
         </span>
       </button>
     </form>
 
-    <!-- Optional error display -->
-    <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
+    <!-- Error Message -->
+    <p v-if="errorMessage" class="text-red-500 mt-3 text-sm">
+      {{ errorMessage }}
+    </p>
   </div>
 </template>
 

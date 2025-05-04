@@ -27,12 +27,13 @@
     <div v-if="!isEmbedded" class="relative group">
       <button
         @click="logout"
-        class="text-gray-600 hover:text-red-500"
+        class="text-gray-600 flex gap-2 border border-[#3B81F6] rounded-xl items-center justify-center p-3 w-36 hover:scale-95 transition duration-300 ease-in-out"
         content="Logout"
         v-tippy="{ placement: 'left' }"
       >
-        <span class="text-blue-500">Logout</span>
-        <i class="fas fa-sign-out-alt text-2xl"></i>
+        <img src="@/assets/icons/logout.svg" />
+        <span class="text-blue-500 font-medium">Logout</span>
+        <!-- <i class="fas fa-sign-out-alt text-2xl"></i>-->
       </button>
       <!-- Tooltip -->
     </div>
@@ -61,9 +62,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.sub-navigation {
-  border-bottom: 1px solid #e5e7eb;
-}
-</style>

@@ -5,7 +5,7 @@
       <router-view />
     </div>
     <!-- ✅ Footer -->
-    <footer class="bg-gray-100 text-center py-4 text-sm text-gray-600">
+    <footer class="bg-white text-center py-6 text-md text-gray-600">
       © {{ currentYear }} Web Diagnostic Tool | by
       <a
         href="https://www.proweaver.com/"
