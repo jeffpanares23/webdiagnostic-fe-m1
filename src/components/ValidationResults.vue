@@ -317,7 +317,7 @@
                           currentPage.sop?.phone_format_valid === false,
                       }"
                     >
-                      {{ currentPage.phone || "—" }}
+                      {{ currentPage.phone_number || "—" }}
                     </span>
                   </div>
 
@@ -331,7 +331,7 @@
                           currentPage.sop?.email_format_valid === false,
                       }"
                     >
-                      {{ currentPage.email || "—" }}
+                      {{ currentPage.email_address || "—" }}
                     </span>
                   </div>
                 </div>
@@ -511,7 +511,7 @@
 </template>
 <script>
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from "chart.js";
-import PieChart from "@/components/PieChart.vue";
+
 import PageIssuesPanel from "@/components/validation/PageIssuesPanel.vue";
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
@@ -731,8 +731,8 @@ export default {
         MetaDescription: page.description,
         HTTPS: page.hasHttps,
         DuplicateTitle: page.is_title_duplicate ? "Yes" : "No",
-        Phone: page.phone,
-        Email: page.email,
+        Phone: page.phone_number,
+        Email: page.email_address,
         company_name: page.company_name,
         PhoneFormatValid: page.sop?.phone_format_valid ? "Yes" : "No",
         EmailFormatValid: page.sop?.email_format_valid ? "Yes" : "No",
