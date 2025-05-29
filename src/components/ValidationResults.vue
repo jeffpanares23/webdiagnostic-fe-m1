@@ -1,7 +1,7 @@
 <template>
   <div class="grid grid-cols-12 gap-4">
     <!-- Left: Main Results Table -->
-    <div class="col-span-9 bg-white p-8">
+    <div class="col-span-12 bg-white p-8">
       <div class="mb-4 flex justify-between items-center">
         <h2 class="text-lg font-semibold">Scanned Pages</h2>
         <button
@@ -135,7 +135,11 @@
       </div>
 
       <!-- Bottom Panel: Tabbed Page Details -->
-      <div v-if="selectedPage" class="mt-4 border rounded p-3 bg-gray-50">
+      <div
+        v-if="selectedPage"
+        ref="detailsSection"
+        class="mt-4 border rounded p-3 bg-gray-50"
+      >
         <div class="mb-2">
           <h3 class="font-semibold text-sm" v-if="currentPage?.url">
             Details for:
@@ -393,10 +397,10 @@
     </div>
 
     <!-- Right: Chart Sidebar -->
-    <div class="col-span-3 bg-white rounded text-sm max-h-96">
+    <!-- <div class="col-span-3 bg-white rounded text-sm max-h-96">
       <h3 class="font-semibold mb-2 text-base p-8">Validation Summary</h3>
       <PieChart :chart-data="chartData" />
-    </div>
+    </div> -->
     <!-- Issues to Fix Section -->
     <div class="col-span-12 mt-4">
       <div class="issues-to-fix bg-white p-4 rounded-md">
@@ -513,7 +517,8 @@ import PageIssuesPanel from "@/components/validation/PageIssuesPanel.vue";
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 export default {
   name: "ValidationResults",
-  components: { PieChart, PageIssuesPanel },
+  // components: { PieChart, PageIssuesPanel },
+  components: { PageIssuesPanel },
   props: {
     results: {
       type: Object,
@@ -708,6 +713,12 @@ export default {
       if (originalIndex !== -1) {
         this.selectedPage = originalIndex;
         localStorage.setItem("selectedPageIndex", originalIndex);
+        // Auto-scroll to "Details for" section
+        this.$nextTick(() => {
+          if (this.$refs.detailsSection) {
+            this.$refs.detailsSection.scrollIntoView({ behavior: "smooth" });
+          }
+        });
       } else {
         console.warn("Page not found in original results.pages.");
       }
@@ -730,6 +741,11 @@ export default {
         CopyrightValid: page.sop?.copyright_year_valid ? "Yes" : "No",
       }));
 
+      if (rows.length === 0) {
+        alert("No data available to export.");
+        return;
+      }
+
       const csv = [
         Object.keys(rows[0]).join(","),
         ...rows.map((row) =>
@@ -743,7 +759,15 @@ export default {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "validation_results.csv";
+      // link.download = "validation_results.csv";
+      // Get company name from the first page that has it
+      const companyName =
+        this.filteredResults.find((p) => p.company_name)?.company_name ||
+        "website";
+
+      const sanitizedCompany = companyName.substring(0, 40); // optional length limit
+
+      link.download = `${sanitizedCompany} Scanned Results.csv`;
       link.click();
       URL.revokeObjectURL(url);
     },

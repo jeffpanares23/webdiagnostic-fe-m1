@@ -29,6 +29,8 @@ export default {
   setup() {
     const route = useRoute();
 
+    const currentYear = new Date().getFullYear();
+
     // ✅ Check if user is authenticated
     const isAuthenticated = computed(() => !!localStorage.getItem("token"));
     // Show SideNavigation and Header only if the route is not '/login'
@@ -40,6 +42,7 @@ export default {
     };
 
     return {
+      currentYear,
       showSideNavigation,
       isSideNavCollapsed,
       toggleSideNavigation,

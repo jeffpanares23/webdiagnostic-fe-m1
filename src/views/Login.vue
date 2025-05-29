@@ -125,7 +125,7 @@ export default {
         // Redirect after brief animation
         setTimeout(() => {
           this.router.push("/dashboard");
-        }, 3000);
+        }, 5000);
       } catch (error) {
         console.error(
           "Login error:",
